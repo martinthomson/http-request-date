@@ -7,11 +7,11 @@
 <title>Using The Date Header Field In HTTP Requests</title>
 <meta content="Martin Thomson" name="author">
 <meta content="
-       TODO Abstract 
+       HTTP clients often make use of 
     " name="description">
 <meta content="xml2rfc 3.12.0" name="generator">
 <meta content="Internet-Draft" name="keyword">
-<meta content="draft-todo-yourname-protocol-latest" name="ietf.draft">
+<meta content="draft-thomson-httpbis-date-requests-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.12.0
     Python 3.9.7
@@ -1024,9 +1024,9 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <div id="internal-metadata" class="document-information">
 <dl id="identifiers">
 <dt class="label-workgroup">Workgroup:</dt>
-<dd class="workgroup">WG Working Group</dd>
+<dd class="workgroup">HTTP</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-todo-yourname-protocol-latest</dd>
+<dd class="internet-draft">draft-thomson-httpbis-date-requests-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
 <time datetime="2022-01-24" class="published">24 January 2022</time>
@@ -1047,7 +1047,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <h1 id="title">Using The Date Header Field In HTTP Requests</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">TODO Abstract<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">HTTP clients often make use of<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1055,14 +1055,14 @@ svg [stroke="fill"], svg [fill^="#fff"] {
       </h2>
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
-        The latest revision of this draft can be found at <span><a href="https://example.com/LATEST">https://example.com/LATEST</a></span>.
-        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-todo-yourname-protocol/">https://datatracker.ietf.org/doc/draft-todo-yourname-protocol/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+        The latest revision of this draft can be found at <span><a href="https://martinthomson.github.io/http-request-date/draft-thomson-httpbis-date-requests.html">https://martinthomson.github.io/http-request-date/draft-thomson-httpbis-date-requests.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-thomson-httpbis-date-requests/">https://datatracker.ietf.org/doc/draft-thomson-httpbis-date-requests/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
         Discussion of this document takes place on the
-        WG Working Group mailing list (<span><a href="mailto:WG@example.com">mailto:WG@example.com</a></span>),
-        which is archived at <span><a href="https://example.com/WG">https://example.com/WG</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+        HTTP Working Group mailing list (<span><a href="mailto:ietf-http-wg@w3.org">mailto:ietf-http-wg@w3.org</a></span>),
+        which is archived at <span><a href="https://lists.w3.org/Archives/Public/ietf-http-wg/">https://lists.w3.org/Archives/Public/ietf-http-wg/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
 <p id="section-note.1-4">Source for this draft and an issue tracker can be found at
-        <span><a href="https://github.com/USER/REPO">https://github.com/USER/REPO</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+        <span><a href="https://github.com/martinthomson/http-request-date">https://github.com/martinthomson/http-request-date</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1119,19 +1119,47 @@ svg [stroke="fill"], svg [fill^="#fff"] {
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-conventions-and-definitions" class="xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="xref">3</a>.  <a href="#name-security-considerations" class="xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="xref">3</a>.  <a href="#name-date-usage" class="xref">Date Usage</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-iana-considerations" class="xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-4xx-date-not-acceptable-sta" class="xref">4xx (Date Not Acceptable) Status Code</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-normative-references" class="xref">Normative References</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-clock-skew" class="xref">Clock Skew</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-date-correction" class="xref">Date Correction</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-scope-of-date-correction" class="xref">Scope of Date Correction</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="xref">5.3</a>.  <a href="#name-intermediaries-and-date-cor" class="xref">Intermediaries and Date Corrections</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#appendix-A" class="xref"></a><a href="#name-acknowledgments" class="xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-security-considerations" class="xref">Security Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-address" class="xref">Author's Address</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-iana-considerations" class="xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>.  <a href="#name-references" class="xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="xref">8.1</a>.  <a href="#name-normative-references" class="xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="xref">8.2</a>.  <a href="#name-informative-references" class="xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="xref"></a><a href="#name-acknowledgments" class="xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="xref"></a><a href="#name-authors-address" class="xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1142,7 +1170,22 @@ svg [stroke="fill"], svg [fill^="#fff"] {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">TODO Introduction<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">Many HTTP requests are timeless.  That is, the contents of the request are not
+bound to a specific point in time.  Thus, the use of the HTTP <code>Date</code> header field
+in requests is rare; see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-semantics-19#section-6.6.1" class="relref">Section 6.6.1</a> of [<a href="#HTTP" class="xref">HTTP</a>]</span>.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">However, in some contexts, it is important that a request only be valid over a
+small period of time.  One such context is when requests are signed
+<span>[<a href="#SIGN" class="xref">SIGN</a>]</span>, where including a time in a
+request might prevent a signed request from being reused at another time.
+Similarly, some uses of OHTTP <span>[<a href="#OHTTP" class="xref">OHTTP</a>]</span> might depend on the
+same sort of replay protection.  It is possible to make anti-replay protections
+at servers more efficient if requests from either far in the past or into the
+future can be rejected.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This document describes some considerations for using the <code>Date</code> request header
+field.  The 4xx (Date Not Acceptable) header field is defined for use in
+rejecting requests with a missing or incorrect <code>Date</code> header field.  Use of this
+status code as a correcting differences in client and server clocks is
+described, along with the privacy considerations that apply to this use.<a href="#section-1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1156,36 +1199,225 @@ described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> 
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="security-considerations">
+<div id="date-usage">
 <section id="section-3">
-      <h2 id="name-security-considerations">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      <h2 id="name-date-usage">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-date-usage" class="section-name selfRef">Date Usage</a>
       </h2>
-<p id="section-3-1">TODO Security<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">Most HTTP clients have no need to use the <code>Date</code> header field in requests.  This
+only changes if it is important that the request not be considered valid at
+another time.  As requests are - by default - trivially copied, stored, and
+modified by any entity that can read them, the addition of a <code>Date</code> header
+field is unlikely to be useful in many cases.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">Signed HTTP requests are one example of where requests might be available to
+entities that are not permitted to alter their contents.  Adding a <code>Date</code>
+request header field - and signing it - ensures that the request cannot be used
+at a very different time to what was intended.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">OHTTP <span>[<a href="#OHTTP" class="xref">OHTTP</a>]</span> is another example of where capture and replay of a request
+might be undesirable.  Here, a partially trusted intermediary, an oblivious
+proxy resource, receives encapsulated HTTP requests.  Though this entity cannot
+read or modify these messages, it is able to delay or replay them.  The
+inclusion of a <code>Date</code> header field in these requests might be used to limit the
+time over which delay or replay is possible.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">In both cases, the inclusion of a <code>Date</code> header field might be part of an
+anti-replay strategy at a server.  A simple ati-replay scheme starts by choosing
+a window of time anchored at the current time.  Requests with timestamps that
+fall within this period are remembered and rejected if they appear again;
+requests with timestamps outside of this window are rejected.  This scheme works
+for any monotonic value (see for example <span><a href="https://rfc-editor.org/rfc/rfc4303#section-3.4.3" class="relref">Section 3.4.3</a> of [<a href="#RFC4303" class="xref">RFC4303</a>]</span>) and
+allows for efficient rejection of duplicate requests with minimal state.<a href="#section-3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="xx-date-not-acceptable-status-code">
+<section id="section-4">
+      <h2 id="name-4xx-date-not-acceptable-sta">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-4xx-date-not-acceptable-sta" class="section-name selfRef">4xx (Date Not Acceptable) Status Code</a>
+      </h2>
+<p id="section-4-1">A server sends a 4xx (Date Not Acceptable) status code in response to a request
+where the <code>Date</code> request header field is either absent or indicates a time that
+is not acceptable to the server.  A server <span class="bcp14">MUST</span> include a <code>Date</code> response header
+field in any responses with a 4xx (Date Not Acceptable) status code.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">In processing a <code>Date</code> header field in a request, a server <span class="bcp14">MUST</span> allow for delays
+in transmitting the request, retransmissions performed by transport protocols,
+plus any processing that might occur in the client and any intermediaries, and
+those parts of the server prior to processing the field.  Additionally, the
+<code>Date</code> header field is only capable of expressing time with a resolution of one
+second.  These factors could mean that the value a server receives could be some
+time in the past.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">Differences between client and server clocks are likely to be a source of most
+disagreements between the server time and the time expressed in <code>Date</code> request
+header field.  <a href="#skew" class="xref">Section 5</a> will explore this problem in more detail and offer some
+means of handling these disagreements.<a href="#section-4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="skew">
+<section id="section-5">
+      <h2 id="name-clock-skew">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-clock-skew" class="section-name selfRef">Clock Skew</a>
+      </h2>
+<p id="section-5-1">Perfect synchronization of client and server clocks is an ideal state that
+generally only exists in tightly controlled settings.  In practice, despite good
+availability of time services like NTP <span>[<a href="#NTP" class="xref">NTP</a>]</span> Internet-connected
+endpoints often disagree about the time (see for example Section 7.1 of
+<span>[<a href="#CLOCKSKEW" class="xref">CLOCKSKEW</a>]</span>).<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">The prevalence of clock skew could justify servers being more tolerant of a
+larger range of values for the <code>Date</code> request header field.  This includes
+accepting times that are a short duration into the future in addition to times
+in the past.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">For a server that uses the <code>Date</code> request header field to limit the state kept
+for anti-replay purposes, the amount of state might be all that determines the
+range of values it accepts.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<div id="date-correction">
+<section id="section-5.1">
+        <h3 id="name-date-correction">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-date-correction" class="section-name selfRef">Date Correction</a>
+        </h3>
+<p id="section-5.1-1">A client can recover from a failure that caused by a bad clock by adjusting the
+time and re-attempting the request.  This occurs when the client includes a
+<code>Date</code> header field that is outside of the range accepted by the server, or when
+the client makes a request without a <code>Date</code> request header field.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">For a fresh 4xx (Date Not Acceptable) response (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19#section-4.2" class="relref">Section 4.2</a> of [<a href="#CACHING" class="xref">CACHING</a>]</span>), the client can re-attempt the request,
+copying the <code>Date</code> header field from the response into its new request.  If the
+response is stale, the client can add the age of the response to determine the
+time to use in a re-attempt; see <a href="#intermediaries" class="xref">Section 5.3</a> for more.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">In addition to adjusting for response age, the client can adjust the time it
+uses based on the elapsed time since it estimates when the response was
+generated.  Note however that if the client retries a request immediately, any
+additional increment is likely to be less than the one second resolution of the
+<code>Date</code> header field under most network conditions.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="scope">
+<section id="section-5.2">
+        <h3 id="name-scope-of-date-correction">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-scope-of-date-correction" class="section-name selfRef">Scope of Date Correction</a>
+        </h3>
+<p id="section-5.2-1">Clients <span class="bcp14">MUST NOT</span> accept the time provided by an arbitrary HTTP server as the
+basis for system-wide time.  Even if the client code in question were able to
+set the time, this exposes clients to attack.  The source of system time
+information needs to be trustworthy as the current time is a critical input to
+security-relevant decisions, such as whether to accept a server certificate
+<span>[<a href="#RFC6125" class="xref">RFC6125</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">Use of date correction allows requests to be correlated.  An immediate retry of
+an identical request with an update <code>Date</code> header field provides the server with
+no additional information.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">Anything other than an immediate retry requires careful consideration of the
+privacy implications.  Use of the same date correction for other requests can be
+used to link those requests to the same client even where other state is not
+carried between requests (such as cookies, TLS session tickets, or URIs).
+Linking requests might be acceptable only where other forms of linkage already
+exist.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">Clients <span class="bcp14">MUST NOT</span> use the time correction from one server when making requests of
+another server.  Using the same date correction across different servers might
+be used by servers to create a communication channel.  For clients that maintain
+per-server state, the specific date correction that is used for each server <span class="bcp14">MUST</span>
+be cleared when clearing server state.  For instance, a web browser that
+remembers a date correction would forget that correction when other state for a
+site, such as cookies.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="intermediaries">
+<section id="section-5.3">
+        <h3 id="name-intermediaries-and-date-cor">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-intermediaries-and-date-cor" class="section-name selfRef">Intermediaries and Date Corrections</a>
+        </h3>
+<p id="section-5.3-1">Some intermediaries, in particular those acting as reverse proxies or gateways,
+will rewrite the Date header field in responses. This applies especially to
+responses served from cache, but this might also apply to those that are
+forwarded directly from an origin server.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-2">Servers that condition their responses on the Date header field <span class="bcp14">SHOULD</span> either
+ensure that intermediaries do not cache responses (by including a
+<code>Cache-Control</code> directive of <code>no-store</code>) or designate the response as
+conditional on the value of the <code>Date</code> request header field (by including the
+token "date" in a <code>Vary</code> header field).<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.3-3">For responses that are forwarded by an intermediary, changes to the <code>Date</code>
+response header field will not change how the client corrects its clock. Errors
+only occur if the clock at the intermediary differs significantly from the clock
+at the origin server or if the intermediary updates the <code>Date</code> response header
+field without also adjusting or removing the <code>Age</code> header field on a stale
+response.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-6">
+      <h2 id="name-security-considerations">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-6-1">Including a <code>Date</code> header field in requests reveals information about the client
+clock.  This might be used to identify clients with vulnerability to attacks
+that depend on incorrect clocks.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2"><a href="#scope" class="xref">Section 5.2</a> contains a discussion of the security and privacy concerns associated
+with date correction.<a href="#section-6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-4">
+<section id="section-7">
       <h2 id="name-iana-considerations">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-4-1">This document has no IANA actions.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">This document has no IANA actions.<a href="#section-7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<section id="section-5">
-      <h2 id="name-normative-references">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<section id="section-8">
+      <h2 id="name-references">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<section id="section-8.1">
+        <h3 id="name-normative-references">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
 <dl class="references">
+<dt id="CACHING">[CACHING]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R. T.</span>, <span class="refAuthor">Nottingham, M.</span>, and <span class="refAuthor">J. Reschke</span>, <span class="refTitle">"HTTP Caching"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-httpbis-cache-19</span>, <time datetime="2021-09-12" class="refDate">12 September 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19">https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
-    <dd>
+      <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
+</section>
+<section id="section-8.2">
+        <h3 id="name-informative-references">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="CLOCKSKEW">[CLOCKSKEW]</dt>
+        <dd>
+<span class="refAuthor">Acer, M.</span>, <span class="refAuthor">Stark, E.</span>, <span class="refAuthor">Felt, A.</span>, <span class="refAuthor">Fahl, S.</span>, <span class="refAuthor">Bhargava, R.</span>, <span class="refAuthor">Dev, B.</span>, <span class="refAuthor">Braithwaite, M.</span>, <span class="refAuthor">Sleevi, R.</span>, and <span class="refAuthor">P. Tabriz</span>, <span class="refTitle">"Where the Wild Warnings Are: Root Causes of Chrome HTTPS Certificate Errors"</span>, <span class="seriesInfo">Proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security</span>, <span class="seriesInfo">DOI 10.1145/3133956.3134007</span>, <time datetime="2017-10" class="refDate">October 2017</time>, <span>&lt;<a href="https://doi.org/10.1145/3133956.3134007">https://doi.org/10.1145/3133956.3134007</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="HTTP">[HTTP]</dt>
+        <dd>
+<span class="refAuthor">Fielding, R. T.</span>, <span class="refAuthor">Nottingham, M.</span>, and <span class="refAuthor">J. Reschke</span>, <span class="refTitle">"HTTP Semantics"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-httpbis-semantics-19</span>, <time datetime="2021-09-12" class="refDate">12 September 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-semantics-19">https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-semantics-19</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="NTP">[NTP]</dt>
+        <dd>
+<span class="refAuthor">Mills, D.</span>, <span class="refAuthor">Martin, J., Ed.</span>, <span class="refAuthor">Burbank, J.</span>, and <span class="refAuthor">W. Kasch</span>, <span class="refTitle">"Network Time Protocol Version 4: Protocol and Algorithms Specification"</span>, <span class="seriesInfo">RFC 5905</span>, <span class="seriesInfo">DOI 10.17487/RFC5905</span>, <time datetime="2010-06" class="refDate">June 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5905">https://www.rfc-editor.org/rfc/rfc5905</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="OHTTP">[OHTTP]</dt>
+        <dd>
+<span class="refAuthor">Thomson, M.</span> and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Oblivious HTTP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ohai-ohttp-00</span>, <time datetime="2021-11-25" class="refDate">25 November 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-ohai-ohttp-00">https://datatracker.ietf.org/doc/html/draft-ietf-ohai-ohttp-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4303">[RFC4303]</dt>
+        <dd>
+<span class="refAuthor">Kent, S.</span>, <span class="refTitle">"IP Encapsulating Security Payload (ESP)"</span>, <span class="seriesInfo">RFC 4303</span>, <span class="seriesInfo">DOI 10.17487/RFC4303</span>, <time datetime="2005-12" class="refDate">December 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4303">https://www.rfc-editor.org/rfc/rfc4303</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6125">[RFC6125]</dt>
+        <dd>
+<span class="refAuthor">Saint-Andre, P.</span> and <span class="refAuthor">J. Hodges</span>, <span class="refTitle">"Representation and Verification of Domain-Based Application Service Identity within Internet Public Key Infrastructure Using X.509 (PKIX) Certificates in the Context of Transport Layer Security (TLS)"</span>, <span class="seriesInfo">RFC 6125</span>, <span class="seriesInfo">DOI 10.17487/RFC6125</span>, <time datetime="2011-03" class="refDate">March 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6125">https://www.rfc-editor.org/rfc/rfc6125</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SIGN">[SIGN]</dt>
+      <dd>
+<span class="refAuthor">Backman, A.</span>, <span class="refAuthor">Richer, J.</span>, and <span class="refAuthor">M. Sporny</span>, <span class="refTitle">"HTTP Message Signatures"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-httpbis-message-signatures-07</span>, <time datetime="2021-12-20" class="refDate">20 December 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-07">https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-07</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
 </section>
 <div id="acknowledgments">
 <section id="appendix-A">

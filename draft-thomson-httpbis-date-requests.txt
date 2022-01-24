@@ -2,34 +2,35 @@
 
 
 
-WG Working Group                                              M. Thomson
+HTTP                                                          M. Thomson
 Internet-Draft                                                   Mozilla
 Intended status: Standards Track                         24 January 2022
 Expires: 28 July 2022
 
 
               Using The Date Header Field In HTTP Requests
-                  draft-todo-yourname-protocol-latest
+               draft-thomson-httpbis-date-requests-latest
 
 Abstract
 
-   TODO Abstract
+   HTTP clients often make use of
 
 About This Document
 
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://example.com/LATEST.  Status information for this document may
-   be found at https://datatracker.ietf.org/doc/draft-todo-yourname-
-   protocol/.
+   https://martinthomson.github.io/http-request-date/draft-thomson-
+   httpbis-date-requests.html.  Status information for this document may
+   be found at https://datatracker.ietf.org/doc/draft-thomson-httpbis-
+   date-requests/.
 
-   Discussion of this document takes place on the WG Working Group
-   mailing list (mailto:WG@example.com), which is archived at
-   https://example.com/WG.
+   Discussion of this document takes place on the HTTP Working Group
+   mailing list (mailto:ietf-http-wg@w3.org), which is archived at
+   https://lists.w3.org/Archives/Public/ietf-http-wg/.
 
    Source for this draft and an issue tracker can be found at
-   https://github.com/USER/REPO.
+   https://github.com/martinthomson/http-request-date.
 
 Status of This Memo
 
@@ -66,15 +67,42 @@ Table of Contents
 
    1.  Introduction
    2.  Conventions and Definitions
-   3.  Security Considerations
-   4.  IANA Considerations
-   5.  Normative References
+   3.  Date Usage
+   4.  4xx (Date Not Acceptable) Status Code
+   5.  Clock Skew
+     5.1.  Date Correction
+     5.2.  Scope of Date Correction
+     5.3.  Intermediaries and Date Corrections
+   6.  Security Considerations
+   7.  IANA Considerations
+   8.  References
+     8.1.  Normative References
+     8.2.  Informative References
    Acknowledgments
    Author's Address
 
 1.  Introduction
 
-   TODO Introduction
+   Many HTTP requests are timeless.  That is, the contents of the
+   request are not bound to a specific point in time.  Thus, the use of
+   the HTTP Date header field in requests is rare; see Section 6.6.1 of
+   [HTTP].
+
+   However, in some contexts, it is important that a request only be
+   valid over a small period of time.  One such context is when requests
+   are signed [SIGN], where including a time in a request might prevent
+   a signed request from being reused at another time.  Similarly, some
+   uses of OHTTP [OHTTP] might depend on the same sort of replay
+   protection.  It is possible to make anti-replay protections at
+   servers more efficient if requests from either far in the past or
+   into the future can be rejected.
+
+   This document describes some considerations for using the Date
+   request header field.  The 4xx (Date Not Acceptable) header field is
+   defined for use in rejecting requests with a missing or incorrect
+   Date header field.  Use of this status code as a correcting
+   differences in client and server clocks is described, along with the
+   privacy considerations that apply to this use.
 
 2.  Conventions and Definitions
 
@@ -84,15 +112,171 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-3.  Security Considerations
+3.  Date Usage
 
-   TODO Security
+   Most HTTP clients have no need to use the Date header field in
+   requests.  This only changes if it is important that the request not
+   be considered valid at another time.  As requests are - by default -
+   trivially copied, stored, and modified by any entity that can read
+   them, the addition of a Date header field is unlikely to be useful in
+   many cases.
 
-4.  IANA Considerations
+   Signed HTTP requests are one example of where requests might be
+   available to entities that are not permitted to alter their contents.
+   Adding a Date request header field - and signing it - ensures that
+   the request cannot be used at a very different time to what was
+   intended.
+
+   OHTTP [OHTTP] is another example of where capture and replay of a
+   request might be undesirable.  Here, a partially trusted
+   intermediary, an oblivious proxy resource, receives encapsulated HTTP
+   requests.  Though this entity cannot read or modify these messages,
+   it is able to delay or replay them.  The inclusion of a Date header
+   field in these requests might be used to limit the time over which
+   delay or replay is possible.
+
+   In both cases, the inclusion of a Date header field might be part of
+   an anti-replay strategy at a server.  A simple ati-replay scheme
+   starts by choosing a window of time anchored at the current time.
+   Requests with timestamps that fall within this period are remembered
+   and rejected if they appear again; requests with timestamps outside
+   of this window are rejected.  This scheme works for any monotonic
+   value (see for example Section 3.4.3 of [RFC4303]) and allows for
+   efficient rejection of duplicate requests with minimal state.
+
+4.  4xx (Date Not Acceptable) Status Code
+
+   A server sends a 4xx (Date Not Acceptable) status code in response to
+   a request where the Date request header field is either absent or
+   indicates a time that is not acceptable to the server.  A server MUST
+   include a Date response header field in any responses with a 4xx
+   (Date Not Acceptable) status code.
+
+   In processing a Date header field in a request, a server MUST allow
+   for delays in transmitting the request, retransmissions performed by
+   transport protocols, plus any processing that might occur in the
+   client and any intermediaries, and those parts of the server prior to
+   processing the field.  Additionally, the Date header field is only
+   capable of expressing time with a resolution of one second.  These
+   factors could mean that the value a server receives could be some
+   time in the past.
+
+   Differences between client and server clocks are likely to be a
+   source of most disagreements between the server time and the time
+   expressed in Date request header field.  Section 5 will explore this
+   problem in more detail and offer some means of handling these
+   disagreements.
+
+5.  Clock Skew
+
+   Perfect synchronization of client and server clocks is an ideal state
+   that generally only exists in tightly controlled settings.  In
+   practice, despite good availability of time services like NTP [NTP]
+   Internet-connected endpoints often disagree about the time (see for
+   example Section 7.1 of [CLOCKSKEW]).
+
+   The prevalence of clock skew could justify servers being more
+   tolerant of a larger range of values for the Date request header
+   field.  This includes accepting times that are a short duration into
+   the future in addition to times in the past.
+
+   For a server that uses the Date request header field to limit the
+   state kept for anti-replay purposes, the amount of state might be all
+   that determines the range of values it accepts.
+
+5.1.  Date Correction
+
+   A client can recover from a failure that caused by a bad clock by
+   adjusting the time and re-attempting the request.  This occurs when
+   the client includes a Date header field that is outside of the range
+   accepted by the server, or when the client makes a request without a
+   Date request header field.
+
+   For a fresh 4xx (Date Not Acceptable) response (see Section 4.2 of
+   [CACHING]), the client can re-attempt the request, copying the Date
+   header field from the response into its new request.  If the response
+   is stale, the client can add the age of the response to determine the
+   time to use in a re-attempt; see Section 5.3 for more.
+
+   In addition to adjusting for response age, the client can adjust the
+   time it uses based on the elapsed time since it estimates when the
+   response was generated.  Note however that if the client retries a
+   request immediately, any additional increment is likely to be less
+   than the one second resolution of the Date header field under most
+   network conditions.
+
+5.2.  Scope of Date Correction
+
+   Clients MUST NOT accept the time provided by an arbitrary HTTP server
+   as the basis for system-wide time.  Even if the client code in
+   question were able to set the time, this exposes clients to attack.
+   The source of system time information needs to be trustworthy as the
+   current time is a critical input to security-relevant decisions, such
+   as whether to accept a server certificate [RFC6125].
+
+   Use of date correction allows requests to be correlated.  An
+   immediate retry of an identical request with an update Date header
+   field provides the server with no additional information.
+
+   Anything other than an immediate retry requires careful consideration
+   of the privacy implications.  Use of the same date correction for
+   other requests can be used to link those requests to the same client
+   even where other state is not carried between requests (such as
+   cookies, TLS session tickets, or URIs).  Linking requests might be
+   acceptable only where other forms of linkage already exist.
+
+   Clients MUST NOT use the time correction from one server when making
+   requests of another server.  Using the same date correction across
+   different servers might be used by servers to create a communication
+   channel.  For clients that maintain per-server state, the specific
+   date correction that is used for each server MUST be cleared when
+   clearing server state.  For instance, a web browser that remembers a
+   date correction would forget that correction when other state for a
+   site, such as cookies.
+
+5.3.  Intermediaries and Date Corrections
+
+   Some intermediaries, in particular those acting as reverse proxies or
+   gateways, will rewrite the Date header field in responses.  This
+   applies especially to responses served from cache, but this might
+   also apply to those that are forwarded directly from an origin
+   server.
+
+   Servers that condition their responses on the Date header field
+   SHOULD either ensure that intermediaries do not cache responses (by
+   including a Cache-Control directive of no-store) or designate the
+   response as conditional on the value of the Date request header field
+   (by including the token "date" in a Vary header field).
+
+   For responses that are forwarded by an intermediary, changes to the
+   Date response header field will not change how the client corrects
+   its clock.  Errors only occur if the clock at the intermediary
+   differs significantly from the clock at the origin server or if the
+   intermediary updates the Date response header field without also
+   adjusting or removing the Age header field on a stale response.
+
+6.  Security Considerations
+
+   Including a Date header field in requests reveals information about
+   the client clock.  This might be used to identify clients with
+   vulnerability to attacks that depend on incorrect clocks.
+
+   Section 5.2 contains a discussion of the security and privacy
+   concerns associated with date correction.
+
+7.  IANA Considerations
 
    This document has no IANA actions.
 
-5.  Normative References
+8.  References
+
+8.1.  Normative References
+
+   [CACHING]  Fielding, R. T., Nottingham, M., and J. Reschke, "HTTP
+              Caching", Work in Progress, Internet-Draft, draft-ietf-
+              httpbis-cache-19, 12 September 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-
+              cache-19>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -102,6 +286,50 @@ Table of Contents
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+8.2.  Informative References
+
+   [CLOCKSKEW]
+              Acer, M., Stark, E., Felt, A., Fahl, S., Bhargava, R.,
+              Dev, B., Braithwaite, M., Sleevi, R., and P. Tabriz,
+              "Where the Wild Warnings Are: Root Causes of Chrome HTTPS
+              Certificate Errors", Proceedings of the 2017 ACM SIGSAC
+              Conference on Computer and Communications Security,
+              DOI 10.1145/3133956.3134007, October 2017,
+              <https://doi.org/10.1145/3133956.3134007>.
+
+   [HTTP]     Fielding, R. T., Nottingham, M., and J. Reschke, "HTTP
+              Semantics", Work in Progress, Internet-Draft, draft-ietf-
+              httpbis-semantics-19, 12 September 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-
+              semantics-19>.
+
+   [NTP]      Mills, D., Martin, J., Ed., Burbank, J., and W. Kasch,
+              "Network Time Protocol Version 4: Protocol and Algorithms
+              Specification", RFC 5905, DOI 10.17487/RFC5905, June 2010,
+              <https://www.rfc-editor.org/rfc/rfc5905>.
+
+   [OHTTP]    Thomson, M. and C. A. Wood, "Oblivious HTTP", Work in
+              Progress, Internet-Draft, draft-ietf-ohai-ohttp-00, 25
+              November 2021, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-ohai-ohttp-00>.
+
+   [RFC4303]  Kent, S., "IP Encapsulating Security Payload (ESP)",
+              RFC 4303, DOI 10.17487/RFC4303, December 2005,
+              <https://www.rfc-editor.org/rfc/rfc4303>.
+
+   [RFC6125]  Saint-Andre, P. and J. Hodges, "Representation and
+              Verification of Domain-Based Application Service Identity
+              within Internet Public Key Infrastructure Using X.509
+              (PKIX) Certificates in the Context of Transport Layer
+              Security (TLS)", RFC 6125, DOI 10.17487/RFC6125, March
+              2011, <https://www.rfc-editor.org/rfc/rfc6125>.
+
+   [SIGN]     Backman, A., Richer, J., and M. Sporny, "HTTP Message
+              Signatures", Work in Progress, Internet-Draft, draft-ietf-
+              httpbis-message-signatures-07, 20 December 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-
+              message-signatures-07>.
 
 Acknowledgments
 
