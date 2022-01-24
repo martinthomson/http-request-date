@@ -19,9 +19,9 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
-category: info
+title: "Using The Date Header Field In HTTP Requests"
+abbrev: "Date Requests"
+category: std
 
 docname: draft-todo-yourname-protocol-latest
 ipr: trust200902
