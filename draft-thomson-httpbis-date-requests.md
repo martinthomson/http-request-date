@@ -120,8 +120,8 @@ means of handling these disagreements.
 Perfect synchronization of client and server clocks is an ideal state that
 generally only exists in tightly controlled settings.  In practice, despite good
 availability of time services like NTP {{?NTP=RFC5905}} Internet-connected
-endpoints often disagree about the time (see for example {{Section 7.1 of
-?CLOCKSKEW=DOI.10.1145/3133956.3134007}}).
+endpoints often disagree about the time (see for example Section 7.1 of
+{{?CLOCKSKEW=DOI.10.1145/3133956.3134007}}).
 
 The prevalence of clock skew could justify servers being more tolerant of a
 larger range of values for the `Date` request header field.  This includes
