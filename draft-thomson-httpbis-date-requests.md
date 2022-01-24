@@ -42,9 +42,9 @@ pi: [toc, sortrefs, symrefs]
 
 author:
  -
-    name: Your Name Here
-    organization: Your Organization Here
-    email: your.email@example.com
+    name: Martin Thomson
+    organization: Mozilla
+    email: mt@lowentropy.net
 
 normative:
 
