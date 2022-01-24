@@ -2,8 +2,8 @@
 
 
 
-WG Working Group                                               Y.N. Here
-Internet-Draft                                    Your Organization Here
+WG Working Group                                              M. Thomson
+Internet-Draft                                                   Mozilla
 Intended status: Standards Track                         24 January 2022
 Expires: 28 July 2022
 
@@ -109,7 +109,7 @@ Acknowledgments
 
 Author's Address
 
-   Your Name Here
-   Your Organization Here
+   Martin Thomson
+   Mozilla
 
-   Email: your.email@example.com
+   Email: mt@lowentropy.net
