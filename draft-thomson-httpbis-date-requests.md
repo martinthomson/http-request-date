@@ -33,7 +33,10 @@ informative:
 
 --- abstract
 
-HTTP clients often make use of
+HTTP clients rarely make use of the Date field when making requests.  This
+document describes considerations for using Date fields in requests.  A method
+of correcting erroneous in Date fields that might arise from a bad clock is
+defined. The risks of applying that correction technique are discussed.
 
 
 --- middle
@@ -54,10 +57,13 @@ at servers more efficient if requests from either far in the past or into the
 future can be rejected.
 
 This document describes some considerations for using the `Date` request header
-field.  The 4xx (Date Not Acceptable) header field is defined for use in
-rejecting requests with a missing or incorrect `Date` header field.  Use of this
-status code as a correcting differences in client and server clocks is
-described, along with the privacy considerations that apply to this use.
+field.  The 4xx (Date Not Acceptable) header field is defined in {{status-code}}
+for use in rejecting requests with a missing or incorrect `Date` header field.
+
+{{skew}} explores the consequences of using `Date` in requests when client and
+server clocks do not agree.  A method for recovering from differences in clocks
+is described in {{correction}}.  {{scope}} describes the privacy considerations
+that apply to this technique.
 
 
 # Conventions and Definitions
@@ -65,13 +71,13 @@ described, along with the privacy considerations that apply to this use.
 {::boilerplate bcp14-tagged}
 
 
-# Date Usage
+# Date in HTTP Requests
 
 Most HTTP clients have no need to use the `Date` header field in requests.  This
 only changes if it is important that the request not be considered valid at
 another time.  As requests are - by default - trivially copied, stored, and
-modified by any entity that can read them, the addition of a `Date` header
-field is unlikely to be useful in many cases.
+modified by any entity that can read them, the addition of a `Date` header field
+is unlikely to be useful in many cases.
 
 Signed HTTP requests are one example of where requests might be available to
 entities that are not permitted to alter their contents.  Adding a `Date`
@@ -86,15 +92,16 @@ inclusion of a `Date` header field in these requests might be used to limit the
 time over which delay or replay is possible.
 
 In both cases, the inclusion of a `Date` header field might be part of an
-anti-replay strategy at a server.  A simple ati-replay scheme starts by choosing
-a window of time anchored at the current time.  Requests with timestamps that
-fall within this period are remembered and rejected if they appear again;
-requests with timestamps outside of this window are rejected.  This scheme works
-for any monotonic value (see for example {{Section 3.4.3 of ?RFC4303}}) and
-allows for efficient rejection of duplicate requests with minimal state.
+anti-replay strategy at a server.  A simple anti-replay scheme starts by
+choosing a window of time anchored at the current time.  Requests with
+timestamps that fall within this period are remembered and rejected if they
+appear again; requests with timestamps outside of this window are rejected.
+This scheme works for any monotonic value (see for example {{Section 3.4.3 of
+?RFC4303}}) and allows for efficient rejection of duplicate requests with
+minimal state.
 
 
-# 4xx (Date Not Acceptable) Status Code
+# 4xx (Date Not Acceptable) Status Code {#status-code}
 
 A server sends a 4xx (Date Not Acceptable) status code in response to a request
 where the `Date` request header field is either absent or indicates a time that
@@ -133,12 +140,15 @@ for anti-replay purposes, the amount of state might be all that determines the
 range of values it accepts.
 
 
-## Date Correction
+## Date Correction {#correction}
+
+Even when a server is tolerant of small clock errors, a valid request from a
+client can be rejected if the client clock is outside of the range of times that
+a server will accept.  A server might also reject a request when the client
+makes a request without a `Date` field.
 
 A client can recover from a failure that caused by a bad clock by adjusting the
-time and re-attempting the request.  This occurs when the client includes a
-`Date` header field that is outside of the range accepted by the server, or when
-the client makes a request without a `Date` request header field.
+time and re-attempting the request.
 
 For a fresh 4xx (Date Not Acceptable) response (see {{Section 4.2 of
 !CACHING=I-D.ietf-httpbis-cache}}), the client can re-attempt the request,
@@ -153,7 +163,7 @@ additional increment is likely to be less than the one second resolution of the
 `Date` header field under most network conditions.
 
 
-## Scope of Date Correction {#scope}
+## Limitations of Date Correction {#scope}
 
 Clients MUST NOT accept the time provided by an arbitrary HTTP server as the
 basis for system-wide time.  Even if the client code in question were able to
@@ -162,24 +172,27 @@ information needs to be trustworthy as the current time is a critical input to
 security-relevant decisions, such as whether to accept a server certificate
 {{?RFC6125}}.
 
-Use of date correction allows requests to be correlated.  An immediate retry of
-an identical request with an update `Date` header field provides the server with
-no additional information.
+Use of date correction allows requests that use the correction to be correlated.
+An immediate retry of an identical request with an update `Date` header field
+only provides the server with the ability to identify where the correction
+originated, but making multiple requests with the same correction links all of
+those requests.
 
 Anything other than an immediate retry requires careful consideration of the
 privacy implications.  Use of the same date correction for other requests can be
-used to link those requests to the same client even where other state is not
-carried between requests (such as cookies, TLS session tickets, or URIs).
-Linking requests might be acceptable only where other forms of linkage already
-exist.
+used to link those requests to the same client.  Using the same date correction
+is equivalent to connection reuse, cookies, TLS session tickets, or other state
+a client might carry between requests.  Linking requests might be acceptable
+only where other forms of linkage already exist.
 
-Clients MUST NOT use the time correction from one server when making requests of
-another server.  Using the same date correction across different servers might
-be used by servers to create a communication channel.  For clients that maintain
-per-server state, the specific date correction that is used for each server MUST
-be cleared when clearing server state.  For instance, a web browser that
-remembers a date correction would forget that correction when other state for a
-site, such as cookies.
+Limitations on use of date corrections is necessary to ensure privacy.  At a
+minimum, clients MUST NOT use the time correction from one server when making
+requests of another server.  Using the same date correction across different
+servers might be used by servers to create a communication channel.  For clients
+that maintain per-server state, the specific date correction that is used for
+each server MUST be cleared when removing other state for that server.  For
+instance, a web browser that remembers a date correction would forget that
+correction when removing cookies and other state.
 
 
 ## Intermediaries and Date Corrections {#intermediaries}
@@ -215,12 +228,23 @@ with date correction.
 
 # IANA Considerations
 
-This document has no IANA actions.
+IANA are requested to add a value to the "Hypertext Transfer Protocol (HTTP)
+Status Code Registry" at [](https://www.iana.org/assignments/http-status-codes)
+as follows:
 
+Value:
+: 4xx (to be assigned)
+
+Description:
+: Date Not Acceptable
+
+Reference:
+: {{status-code}} of this document
 
 --- back
 
 # Acknowledgments
 {:numbered="false"}
 
-TODO acknowledge.
+This document is a result of discussions about how to provide anti-replay
+protection for OHTTP in which Chris Wood and Eric Rescorla were instrumental.
