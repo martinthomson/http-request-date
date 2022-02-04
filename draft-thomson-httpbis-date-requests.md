@@ -33,10 +33,11 @@ informative:
 
 --- abstract
 
-HTTP clients rarely make use of the Date field when making requests.  This
-document describes considerations for using Date fields in requests.  A method
-of correcting erroneous in Date fields that might arise from a bad clock is
-defined. The risks of applying that correction technique are discussed.
+HTTP clients rarely make use of the `Date` header field when making requests.
+This document describes considerations for using the `Date` header field in
+requests.  A method is described for correcting erroneous in `Date` request
+header fields that might arise from differences in client and server clocks. The
+risks of applying that correction technique are discussed.
 
 
 --- middle
@@ -58,12 +59,13 @@ future can be rejected.
 
 This document describes some considerations for using the `Date` request header
 field.  The 4xx (Date Not Acceptable) header field is defined in {{status-code}}
-for use in rejecting requests with a missing or incorrect `Date` header field.
+for use in rejecting requests with a missing or incorrect `Date` request header
+field.
 
-{{skew}} explores the consequences of using `Date` in requests when client and
-server clocks do not agree.  A method for recovering from differences in clocks
-is described in {{correction}}.  {{scope}} describes the privacy considerations
-that apply to this technique.
+{{skew}} explores the consequences of using `Date` header field in requests when
+client and server clocks do not agree.  A method for recovering from differences
+in clocks is described in {{correction}}.  {{scope}} describes the privacy
+considerations that apply to this technique.
 
 
 # Conventions and Definitions
@@ -91,8 +93,8 @@ read or modify these messages, it is able to delay or replay them.  The
 inclusion of a `Date` header field in these requests might be used to limit the
 time over which delay or replay is possible.
 
-In both cases, the inclusion of a `Date` header field might be part of an
-anti-replay strategy at a server.  A simple anti-replay scheme starts by
+In both cases, the inclusion of a `Date` request header field might be part of
+an anti-replay strategy at a server.  A simple anti-replay scheme starts by
 choosing a window of time anchored at the current time.  Requests with
 timestamps that fall within this period are remembered and rejected if they
 appear again; requests with timestamps outside of this window are rejected.
@@ -145,7 +147,7 @@ range of values it accepts.
 Even when a server is tolerant of small clock errors, a valid request from a
 client can be rejected if the client clock is outside of the range of times that
 a server will accept.  A server might also reject a request when the client
-makes a request without a `Date` field.
+makes a request without a `Date` header field.
 
 A client can recover from a failure that caused by a bad clock by adjusting the
 time and re-attempting the request.
@@ -174,8 +176,8 @@ security-relevant decisions, such as whether to accept a server certificate
 
 Use of date correction allows requests that use the correction to be correlated.
 An immediate retry of an identical request with an update `Date` header field
-only provides the server with the ability to identify where the correction
-originated, but making multiple requests with the same correction links all of
+only provides the server with the ability to match the retry to the original
+request, but making multiple requests with the same correction links all of
 those requests.
 
 Anything other than an immediate retry requires careful consideration of the
@@ -198,11 +200,11 @@ correction when removing cookies and other state.
 ## Intermediaries and Date Corrections {#intermediaries}
 
 Some intermediaries, in particular those acting as reverse proxies or gateways,
-will rewrite the Date header field in responses. This applies especially to
+will rewrite the `Date` header field in responses. This applies especially to
 responses served from cache, but this might also apply to those that are
 forwarded directly from an origin server.
 
-Servers that condition their responses on the Date header field SHOULD either
+Servers that condition their responses on the `Date` header field SHOULD either
 ensure that intermediaries do not cache responses (by including a
 `Cache-Control` directive of `no-store`) or designate the response as
 conditional on the value of the `Date` request header field (by including the
