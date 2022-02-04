@@ -249,4 +249,5 @@ Reference:
 {:numbered="false"}
 
 This document is a result of discussions about how to provide anti-replay
-protection for OHTTP in which Chris Wood and Eric Rescorla were instrumental.
+protection for OHTTP in which Mark Nottingham, Eric Rescorla, and Chris Wood
+were instrumental.
