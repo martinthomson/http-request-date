@@ -7,10 +7,11 @@
 <title>Using The Date Header Field In HTTP Requests</title>
 <meta content="Martin Thomson" name="author">
 <meta content="
-       HTTP clients rarely make use of the Date field when making requests.  This
-document describes considerations for using Date fields in requests.  A method
-of correcting erroneous in Date fields that might arise from a bad clock is
-defined. The risks of applying that correction technique are discussed. 
+       HTTP clients rarely make use of the  Date  header field when making requests.
+This document describes considerations for using the  Date  header field in
+requests.  A method is described for correcting erroneous in  Date  request
+header fields that might arise from differences in client and server clocks. The
+risks of applying that correction technique are discussed. 
     " name="description">
 <meta content="xml2rfc 3.12.1" name="generator">
 <meta content="Internet-Draft" name="keyword">
@@ -1050,10 +1051,11 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <h1 id="title">Using The Date Header Field In HTTP Requests</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">HTTP clients rarely make use of the Date field when making requests.  This
-document describes considerations for using Date fields in requests.  A method
-of correcting erroneous in Date fields that might arise from a bad clock is
-defined. The risks of applying that correction technique are discussed.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">HTTP clients rarely make use of the <code>Date</code> header field when making requests.
+This document describes considerations for using the <code>Date</code> header field in
+requests.  A method is described for correcting erroneous in <code>Date</code> request
+header fields that might arise from differences in client and server clocks. The
+risks of applying that correction technique are discussed.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1189,11 +1191,12 @@ at servers more efficient if requests from either far in the past or into the
 future can be rejected.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This document describes some considerations for using the <code>Date</code> request header
 field.  The 4xx (Date Not Acceptable) header field is defined in <a href="#status-code" class="xref">Section 4</a>
-for use in rejecting requests with a missing or incorrect <code>Date</code> header field.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4"><a href="#skew" class="xref">Section 5</a> explores the consequences of using <code>Date</code> in requests when client and
-server clocks do not agree.  A method for recovering from differences in clocks
-is described in <a href="#correction" class="xref">Section 5.1</a>.  <a href="#scope" class="xref">Section 5.2</a> describes the privacy considerations
-that apply to this technique.<a href="#section-1-4" class="pilcrow">¶</a></p>
+for use in rejecting requests with a missing or incorrect <code>Date</code> request header
+field.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4"><a href="#skew" class="xref">Section 5</a> explores the consequences of using <code>Date</code> header field in requests when
+client and server clocks do not agree.  A method for recovering from differences
+in clocks is described in <a href="#correction" class="xref">Section 5.1</a>.  <a href="#scope" class="xref">Section 5.2</a> describes the privacy
+considerations that apply to this technique.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1227,8 +1230,8 @@ proxy resource, receives encapsulated HTTP requests.  Though this entity cannot
 read or modify these messages, it is able to delay or replay them.  The
 inclusion of a <code>Date</code> header field in these requests might be used to limit the
 time over which delay or replay is possible.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">In both cases, the inclusion of a <code>Date</code> header field might be part of an
-anti-replay strategy at a server.  A simple anti-replay scheme starts by
+<p id="section-3-4">In both cases, the inclusion of a <code>Date</code> request header field might be part of
+an anti-replay strategy at a server.  A simple anti-replay scheme starts by
 choosing a window of time anchored at the current time.  Requests with
 timestamps that fall within this period are remembered and rejected if they
 appear again; requests with timestamps outside of this window are rejected.
@@ -1283,7 +1286,7 @@ range of values it accepts.<a href="#section-5-3" class="pilcrow">¶</a></p>
 <p id="section-5.1-1">Even when a server is tolerant of small clock errors, a valid request from a
 client can be rejected if the client clock is outside of the range of times that
 a server will accept.  A server might also reject a request when the client
-makes a request without a <code>Date</code> field.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+makes a request without a <code>Date</code> header field.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.1-2">A client can recover from a failure that caused by a bad clock by adjusting the
 time and re-attempting the request.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 <p id="section-5.1-3">For a fresh 4xx (Date Not Acceptable) response (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19#section-4.2" class="relref">Section 4.2</a> of [<a href="#CACHING" class="xref">CACHING</a>]</span>), the client can re-attempt the request,
@@ -1310,8 +1313,8 @@ security-relevant decisions, such as whether to accept a server certificate
 <span>[<a href="#RFC6125" class="xref">RFC6125</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">Use of date correction allows requests that use the correction to be correlated.
 An immediate retry of an identical request with an update <code>Date</code> header field
-only provides the server with the ability to identify where the correction
-originated, but making multiple requests with the same correction links all of
+only provides the server with the ability to match the retry to the original
+request, but making multiple requests with the same correction links all of
 those requests.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">Anything other than an immediate retry requires careful consideration of the
 privacy implications.  Use of the same date correction for other requests can be
@@ -1335,10 +1338,10 @@ correction when removing cookies and other state.<a href="#section-5.2-4" class=
 <a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-intermediaries-and-date-cor" class="section-name selfRef">Intermediaries and Date Corrections</a>
         </h3>
 <p id="section-5.3-1">Some intermediaries, in particular those acting as reverse proxies or gateways,
-will rewrite the Date header field in responses. This applies especially to
+will rewrite the <code>Date</code> header field in responses. This applies especially to
 responses served from cache, but this might also apply to those that are
 forwarded directly from an origin server.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.3-2">Servers that condition their responses on the Date header field <span class="bcp14">SHOULD</span> either
+<p id="section-5.3-2">Servers that condition their responses on the <code>Date</code> header field <span class="bcp14">SHOULD</span> either
 ensure that intermediaries do not cache responses (by including a
 <code>Cache-Control</code> directive of <code>no-store</code>) or designate the response as
 conditional on the value of the <code>Date</code> request header field (by including the

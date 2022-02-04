@@ -13,10 +13,11 @@ Expires: 8 August 2022
 
 Abstract
 
-   HTTP clients rarely make use of the Date field when making requests.
-   This document describes considerations for using Date fields in
-   requests.  A method of correcting erroneous in Date fields that might
-   arise from a bad clock is defined.  The risks of applying that
+   HTTP clients rarely make use of the Date header field when making
+   requests.  This document describes considerations for using the Date
+   header field in requests.  A method is described for correcting
+   erroneous in Date request header fields that might arise from
+   differences in client and server clocks.  The risks of applying that
    correction technique are discussed.
 
 About This Document
@@ -104,12 +105,13 @@ Table of Contents
    This document describes some considerations for using the Date
    request header field.  The 4xx (Date Not Acceptable) header field is
    defined in Section 4 for use in rejecting requests with a missing or
-   incorrect Date header field.
+   incorrect Date request header field.
 
-   Section 5 explores the consequences of using Date in requests when
-   client and server clocks do not agree.  A method for recovering from
-   differences in clocks is described in Section 5.1.  Section 5.2
-   describes the privacy considerations that apply to this technique.
+   Section 5 explores the consequences of using Date header field in
+   requests when client and server clocks do not agree.  A method for
+   recovering from differences in clocks is described in Section 5.1.
+   Section 5.2 describes the privacy considerations that apply to this
+   technique.
 
 2.  Conventions and Definitions
 
@@ -142,14 +144,15 @@ Table of Contents
    field in these requests might be used to limit the time over which
    delay or replay is possible.
 
-   In both cases, the inclusion of a Date header field might be part of
-   an anti-replay strategy at a server.  A simple anti-replay scheme
-   starts by choosing a window of time anchored at the current time.
-   Requests with timestamps that fall within this period are remembered
-   and rejected if they appear again; requests with timestamps outside
-   of this window are rejected.  This scheme works for any monotonic
-   value (see for example Section 3.4.3 of [RFC4303]) and allows for
-   efficient rejection of duplicate requests with minimal state.
+   In both cases, the inclusion of a Date request header field might be
+   part of an anti-replay strategy at a server.  A simple anti-replay
+   scheme starts by choosing a window of time anchored at the current
+   time.  Requests with timestamps that fall within this period are
+   remembered and rejected if they appear again; requests with
+   timestamps outside of this window are rejected.  This scheme works
+   for any monotonic value (see for example Section 3.4.3 of [RFC4303])
+   and allows for efficient rejection of duplicate requests with minimal
+   state.
 
 4.  4xx (Date Not Acceptable) Status Code
 
@@ -196,7 +199,8 @@ Table of Contents
    Even when a server is tolerant of small clock errors, a valid request
    from a client can be rejected if the client clock is outside of the
    range of times that a server will accept.  A server might also reject
-   a request when the client makes a request without a Date field.
+   a request when the client makes a request without a Date header
+   field.
 
    A client can recover from a failure that caused by a bad clock by
    adjusting the time and re-attempting the request.
@@ -226,8 +230,8 @@ Table of Contents
    Use of date correction allows requests that use the correction to be
    correlated.  An immediate retry of an identical request with an
    update Date header field only provides the server with the ability to
-   identify where the correction originated, but making multiple
-   requests with the same correction links all of those requests.
+   match the retry to the original request, but making multiple requests
+   with the same correction links all of those requests.
 
    Anything other than an immediate retry requires careful consideration
    of the privacy implications.  Use of the same date correction for
