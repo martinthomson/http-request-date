@@ -7,13 +7,16 @@
 <title>Using The Date Header Field In HTTP Requests</title>
 <meta content="Martin Thomson" name="author">
 <meta content="
-       HTTP clients often make use of 
+       HTTP clients rarely make use of the Date field when making requests.  This
+document describes considerations for using Date fields in requests.  A method
+of correcting erroneous in Date fields that might arise from a bad clock is
+defined. The risks of applying that correction technique are discussed. 
     " name="description">
-<meta content="xml2rfc 3.12.0" name="generator">
+<meta content="xml2rfc 3.12.1" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-thomson-httpbis-date-requests-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.12.0
+  xml2rfc 3.12.1
     Python 3.9.7
     appdirs 1.4.4
     ConfigArgParse 1.3
@@ -1012,11 +1015,11 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Date Requests</td>
-<td class="right">January 2022</td>
+<td class="right">February 2022</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Thomson</td>
-<td class="center">Expires 28 July 2022</td>
+<td class="center">Expires 8 August 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1029,12 +1032,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-thomson-httpbis-date-requests-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-01-24" class="published">24 January 2022</time>
+<time datetime="2022-02-04" class="published">4 February 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-07-28">28 July 2022</time></dd>
+<dd class="expires"><time datetime="2022-08-08">8 August 2022</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1047,7 +1050,10 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <h1 id="title">Using The Date Header Field In HTTP Requests</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">HTTP clients often make use of<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">HTTP clients rarely make use of the Date field when making requests.  This
+document describes considerations for using Date fields in requests.  A method
+of correcting erroneous in Date fields that might arise from a bad clock is
+defined. The risks of applying that correction technique are discussed.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1083,7 +1089,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 28 July 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 8 August 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1119,7 +1125,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-conventions-and-definitions" class="xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="xref">3</a>.  <a href="#name-date-usage" class="xref">Date Usage</a></p>
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="xref">3</a>.  <a href="#name-date-in-http-requests" class="xref">Date in HTTP Requests</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-4xx-date-not-acceptable-sta" class="xref">4xx (Date Not Acceptable) Status Code</a></p>
@@ -1131,7 +1137,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
                 <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-date-correction" class="xref">Date Correction</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-scope-of-date-correction" class="xref">Scope of Date Correction</a></p>
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-limitations-of-date-correct" class="xref">Limitations of Date Correction</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
                 <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="xref">5.3</a>.  <a href="#name-intermediaries-and-date-cor" class="xref">Intermediaries and Date Corrections</a></p>
@@ -1182,10 +1188,12 @@ same sort of replay protection.  It is possible to make anti-replay protections
 at servers more efficient if requests from either far in the past or into the
 future can be rejected.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This document describes some considerations for using the <code>Date</code> request header
-field.  The 4xx (Date Not Acceptable) header field is defined for use in
-rejecting requests with a missing or incorrect <code>Date</code> header field.  Use of this
-status code as a correcting differences in client and server clocks is
-described, along with the privacy considerations that apply to this use.<a href="#section-1-3" class="pilcrow">¶</a></p>
+field.  The 4xx (Date Not Acceptable) header field is defined in <a href="#status-code" class="xref">Section 4</a>
+for use in rejecting requests with a missing or incorrect <code>Date</code> header field.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4"><a href="#skew" class="xref">Section 5</a> explores the consequences of using <code>Date</code> in requests when client and
+server clocks do not agree.  A method for recovering from differences in clocks
+is described in <a href="#correction" class="xref">Section 5.1</a>.  <a href="#scope" class="xref">Section 5.2</a> describes the privacy considerations
+that apply to this technique.<a href="#section-1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1199,16 +1207,16 @@ described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> 
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="date-usage">
+<div id="date-in-http-requests">
 <section id="section-3">
-      <h2 id="name-date-usage">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-date-usage" class="section-name selfRef">Date Usage</a>
+      <h2 id="name-date-in-http-requests">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-date-in-http-requests" class="section-name selfRef">Date in HTTP Requests</a>
       </h2>
 <p id="section-3-1">Most HTTP clients have no need to use the <code>Date</code> header field in requests.  This
 only changes if it is important that the request not be considered valid at
 another time.  As requests are - by default - trivially copied, stored, and
-modified by any entity that can read them, the addition of a <code>Date</code> header
-field is unlikely to be useful in many cases.<a href="#section-3-1" class="pilcrow">¶</a></p>
+modified by any entity that can read them, the addition of a <code>Date</code> header field
+is unlikely to be useful in many cases.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">Signed HTTP requests are one example of where requests might be available to
 entities that are not permitted to alter their contents.  Adding a <code>Date</code>
 request header field - and signing it - ensures that the request cannot be used
@@ -1220,15 +1228,15 @@ read or modify these messages, it is able to delay or replay them.  The
 inclusion of a <code>Date</code> header field in these requests might be used to limit the
 time over which delay or replay is possible.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">In both cases, the inclusion of a <code>Date</code> header field might be part of an
-anti-replay strategy at a server.  A simple ati-replay scheme starts by choosing
-a window of time anchored at the current time.  Requests with timestamps that
-fall within this period are remembered and rejected if they appear again;
-requests with timestamps outside of this window are rejected.  This scheme works
-for any monotonic value (see for example <span><a href="https://rfc-editor.org/rfc/rfc4303#section-3.4.3" class="relref">Section 3.4.3</a> of [<a href="#RFC4303" class="xref">RFC4303</a>]</span>) and
-allows for efficient rejection of duplicate requests with minimal state.<a href="#section-3-4" class="pilcrow">¶</a></p>
+anti-replay strategy at a server.  A simple anti-replay scheme starts by
+choosing a window of time anchored at the current time.  Requests with
+timestamps that fall within this period are remembered and rejected if they
+appear again; requests with timestamps outside of this window are rejected.
+This scheme works for any monotonic value (see for example <span><a href="https://rfc-editor.org/rfc/rfc4303#section-3.4.3" class="relref">Section 3.4.3</a> of [<a href="#RFC4303" class="xref">RFC4303</a>]</span>) and allows for efficient rejection of duplicate requests with
+minimal state.<a href="#section-3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="xx-date-not-acceptable-status-code">
+<div id="status-code">
 <section id="section-4">
       <h2 id="name-4xx-date-not-acceptable-sta">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-4xx-date-not-acceptable-sta" class="section-name selfRef">4xx (Date Not Acceptable) Status Code</a>
@@ -1267,30 +1275,32 @@ in the past.<a href="#section-5-2" class="pilcrow">¶</a></p>
 <p id="section-5-3">For a server that uses the <code>Date</code> request header field to limit the state kept
 for anti-replay purposes, the amount of state might be all that determines the
 range of values it accepts.<a href="#section-5-3" class="pilcrow">¶</a></p>
-<div id="date-correction">
+<div id="correction">
 <section id="section-5.1">
         <h3 id="name-date-correction">
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-date-correction" class="section-name selfRef">Date Correction</a>
         </h3>
-<p id="section-5.1-1">A client can recover from a failure that caused by a bad clock by adjusting the
-time and re-attempting the request.  This occurs when the client includes a
-<code>Date</code> header field that is outside of the range accepted by the server, or when
-the client makes a request without a <code>Date</code> request header field.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">For a fresh 4xx (Date Not Acceptable) response (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19#section-4.2" class="relref">Section 4.2</a> of [<a href="#CACHING" class="xref">CACHING</a>]</span>), the client can re-attempt the request,
+<p id="section-5.1-1">Even when a server is tolerant of small clock errors, a valid request from a
+client can be rejected if the client clock is outside of the range of times that
+a server will accept.  A server might also reject a request when the client
+makes a request without a <code>Date</code> field.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">A client can recover from a failure that caused by a bad clock by adjusting the
+time and re-attempting the request.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">For a fresh 4xx (Date Not Acceptable) response (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19#section-4.2" class="relref">Section 4.2</a> of [<a href="#CACHING" class="xref">CACHING</a>]</span>), the client can re-attempt the request,
 copying the <code>Date</code> header field from the response into its new request.  If the
 response is stale, the client can add the age of the response to determine the
-time to use in a re-attempt; see <a href="#intermediaries" class="xref">Section 5.3</a> for more.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3">In addition to adjusting for response age, the client can adjust the time it
+time to use in a re-attempt; see <a href="#intermediaries" class="xref">Section 5.3</a> for more.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">In addition to adjusting for response age, the client can adjust the time it
 uses based on the elapsed time since it estimates when the response was
 generated.  Note however that if the client retries a request immediately, any
 additional increment is likely to be less than the one second resolution of the
-<code>Date</code> header field under most network conditions.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<code>Date</code> header field under most network conditions.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="scope">
 <section id="section-5.2">
-        <h3 id="name-scope-of-date-correction">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-scope-of-date-correction" class="section-name selfRef">Scope of Date Correction</a>
+        <h3 id="name-limitations-of-date-correct">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-limitations-of-date-correct" class="section-name selfRef">Limitations of Date Correction</a>
         </h3>
 <p id="section-5.2-1">Clients <span class="bcp14">MUST NOT</span> accept the time provided by an arbitrary HTTP server as the
 basis for system-wide time.  Even if the client code in question were able to
@@ -1298,22 +1308,25 @@ set the time, this exposes clients to attack.  The source of system time
 information needs to be trustworthy as the current time is a critical input to
 security-relevant decisions, such as whether to accept a server certificate
 <span>[<a href="#RFC6125" class="xref">RFC6125</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">Use of date correction allows requests to be correlated.  An immediate retry of
-an identical request with an update <code>Date</code> header field provides the server with
-no additional information.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">Use of date correction allows requests that use the correction to be correlated.
+An immediate retry of an identical request with an update <code>Date</code> header field
+only provides the server with the ability to identify where the correction
+originated, but making multiple requests with the same correction links all of
+those requests.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">Anything other than an immediate retry requires careful consideration of the
 privacy implications.  Use of the same date correction for other requests can be
-used to link those requests to the same client even where other state is not
-carried between requests (such as cookies, TLS session tickets, or URIs).
-Linking requests might be acceptable only where other forms of linkage already
-exist.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
-<p id="section-5.2-4">Clients <span class="bcp14">MUST NOT</span> use the time correction from one server when making requests of
-another server.  Using the same date correction across different servers might
-be used by servers to create a communication channel.  For clients that maintain
-per-server state, the specific date correction that is used for each server <span class="bcp14">MUST</span>
-be cleared when clearing server state.  For instance, a web browser that
-remembers a date correction would forget that correction when other state for a
-site, such as cookies.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+used to link those requests to the same client.  Using the same date correction
+is equivalent to connection reuse, cookies, TLS session tickets, or other state
+a client might carry between requests.  Linking requests might be acceptable
+only where other forms of linkage already exist.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">Limitations on use of date corrections is necessary to ensure privacy.  At a
+minimum, clients <span class="bcp14">MUST NOT</span> use the time correction from one server when making
+requests of another server.  Using the same date correction across different
+servers might be used by servers to create a communication channel.  For clients
+that maintain per-server state, the specific date correction that is used for
+each server <span class="bcp14">MUST</span> be cleared when removing other state for that server.  For
+instance, a web browser that remembers a date correction would forget that
+correction when removing cookies and other state.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="intermediaries">
@@ -1357,7 +1370,29 @@ with date correction.<a href="#section-6-2" class="pilcrow">¶</a></p>
       <h2 id="name-iana-considerations">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-7-1">This document has no IANA actions.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">IANA are requested to add a value to the "Hypertext Transfer Protocol (HTTP)
+Status Code Registry" at <span><a href="https://www.iana.org/assignments/http-status-codes">https://www.iana.org/assignments/http-status-codes</a></span>
+as follows:<a href="#section-7-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7-2">
+        <dt id="section-7-2.1">
+Value:  </dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.2">
+          <p id="section-7-2.2.1">4xx (to be assigned)<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-2.3">
+Description:  </dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.4">
+          <p id="section-7-2.4.1">Date Not Acceptable<a href="#section-7-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-2.5">
+Reference:  </dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.6">
+          <p id="section-7-2.6.1"><a href="#status-code" class="xref">Section 4</a> of this document<a href="#section-7-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
 </section>
 </div>
 <section id="section-8">
@@ -1414,7 +1449,7 @@ with date correction.<a href="#section-6-2" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="SIGN">[SIGN]</dt>
       <dd>
-<span class="refAuthor">Backman, A.</span>, <span class="refAuthor">Richer, J.</span>, and <span class="refAuthor">M. Sporny</span>, <span class="refTitle">"HTTP Message Signatures"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-httpbis-message-signatures-07</span>, <time datetime="2021-12-20" class="refDate">20 December 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-07">https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-07</a>&gt;</span>. </dd>
+<span class="refAuthor">Backman, A.</span>, <span class="refAuthor">Richer, J.</span>, and <span class="refAuthor">M. Sporny</span>, <span class="refTitle">"HTTP Message Signatures"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-httpbis-message-signatures-08</span>, <time datetime="2022-01-28" class="refDate">28 January 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-08">https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-08</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -1424,7 +1459,8 @@ with date correction.<a href="#section-6-2" class="pilcrow">¶</a></p>
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">This document is a result of discussions about how to provide anti-replay
+protection for OHTTP in which Chris Wood and Eric Rescorla were instrumental.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">

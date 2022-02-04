@@ -4,8 +4,8 @@
 
 HTTP                                                          M. Thomson
 Internet-Draft                                                   Mozilla
-Intended status: Standards Track                         24 January 2022
-Expires: 28 July 2022
+Intended status: Standards Track                         4 February 2022
+Expires: 8 August 2022
 
 
               Using The Date Header Field In HTTP Requests
@@ -13,7 +13,11 @@ Expires: 28 July 2022
 
 Abstract
 
-   HTTP clients often make use of
+   HTTP clients rarely make use of the Date field when making requests.
+   This document describes considerations for using Date fields in
+   requests.  A method of correcting erroneous in Date fields that might
+   arise from a bad clock is defined.  The risks of applying that
+   correction technique are discussed.
 
 About This Document
 
@@ -47,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 July 2022.
+   This Internet-Draft will expire on 8 August 2022.
 
 Copyright Notice
 
@@ -67,11 +71,11 @@ Table of Contents
 
    1.  Introduction
    2.  Conventions and Definitions
-   3.  Date Usage
+   3.  Date in HTTP Requests
    4.  4xx (Date Not Acceptable) Status Code
    5.  Clock Skew
      5.1.  Date Correction
-     5.2.  Scope of Date Correction
+     5.2.  Limitations of Date Correction
      5.3.  Intermediaries and Date Corrections
    6.  Security Considerations
    7.  IANA Considerations
@@ -99,10 +103,13 @@ Table of Contents
 
    This document describes some considerations for using the Date
    request header field.  The 4xx (Date Not Acceptable) header field is
-   defined for use in rejecting requests with a missing or incorrect
-   Date header field.  Use of this status code as a correcting
-   differences in client and server clocks is described, along with the
-   privacy considerations that apply to this use.
+   defined in Section 4 for use in rejecting requests with a missing or
+   incorrect Date header field.
+
+   Section 5 explores the consequences of using Date in requests when
+   client and server clocks do not agree.  A method for recovering from
+   differences in clocks is described in Section 5.1.  Section 5.2
+   describes the privacy considerations that apply to this technique.
 
 2.  Conventions and Definitions
 
@@ -112,7 +119,7 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-3.  Date Usage
+3.  Date in HTTP Requests
 
    Most HTTP clients have no need to use the Date header field in
    requests.  This only changes if it is important that the request not
@@ -136,7 +143,7 @@ Table of Contents
    delay or replay is possible.
 
    In both cases, the inclusion of a Date header field might be part of
-   an anti-replay strategy at a server.  A simple ati-replay scheme
+   an anti-replay strategy at a server.  A simple anti-replay scheme
    starts by choosing a window of time anchored at the current time.
    Requests with timestamps that fall within this period are remembered
    and rejected if they appear again; requests with timestamps outside
@@ -186,11 +193,13 @@ Table of Contents
 
 5.1.  Date Correction
 
+   Even when a server is tolerant of small clock errors, a valid request
+   from a client can be rejected if the client clock is outside of the
+   range of times that a server will accept.  A server might also reject
+   a request when the client makes a request without a Date field.
+
    A client can recover from a failure that caused by a bad clock by
-   adjusting the time and re-attempting the request.  This occurs when
-   the client includes a Date header field that is outside of the range
-   accepted by the server, or when the client makes a request without a
-   Date request header field.
+   adjusting the time and re-attempting the request.
 
    For a fresh 4xx (Date Not Acceptable) response (see Section 4.2 of
    [CACHING]), the client can re-attempt the request, copying the Date
@@ -205,7 +214,7 @@ Table of Contents
    than the one second resolution of the Date header field under most
    network conditions.
 
-5.2.  Scope of Date Correction
+5.2.  Limitations of Date Correction
 
    Clients MUST NOT accept the time provided by an arbitrary HTTP server
    as the basis for system-wide time.  Even if the client code in
@@ -214,25 +223,29 @@ Table of Contents
    current time is a critical input to security-relevant decisions, such
    as whether to accept a server certificate [RFC6125].
 
-   Use of date correction allows requests to be correlated.  An
-   immediate retry of an identical request with an update Date header
-   field provides the server with no additional information.
+   Use of date correction allows requests that use the correction to be
+   correlated.  An immediate retry of an identical request with an
+   update Date header field only provides the server with the ability to
+   identify where the correction originated, but making multiple
+   requests with the same correction links all of those requests.
 
    Anything other than an immediate retry requires careful consideration
    of the privacy implications.  Use of the same date correction for
-   other requests can be used to link those requests to the same client
-   even where other state is not carried between requests (such as
-   cookies, TLS session tickets, or URIs).  Linking requests might be
-   acceptable only where other forms of linkage already exist.
+   other requests can be used to link those requests to the same client.
+   Using the same date correction is equivalent to connection reuse,
+   cookies, TLS session tickets, or other state a client might carry
+   between requests.  Linking requests might be acceptable only where
+   other forms of linkage already exist.
 
-   Clients MUST NOT use the time correction from one server when making
-   requests of another server.  Using the same date correction across
-   different servers might be used by servers to create a communication
-   channel.  For clients that maintain per-server state, the specific
-   date correction that is used for each server MUST be cleared when
-   clearing server state.  For instance, a web browser that remembers a
-   date correction would forget that correction when other state for a
-   site, such as cookies.
+   Limitations on use of date corrections is necessary to ensure
+   privacy.  At a minimum, clients MUST NOT use the time correction from
+   one server when making requests of another server.  Using the same
+   date correction across different servers might be used by servers to
+   create a communication channel.  For clients that maintain per-server
+   state, the specific date correction that is used for each server MUST
+   be cleared when removing other state for that server.  For instance,
+   a web browser that remembers a date correction would forget that
+   correction when removing cookies and other state.
 
 5.3.  Intermediaries and Date Corrections
 
@@ -266,7 +279,15 @@ Table of Contents
 
 7.  IANA Considerations
 
-   This document has no IANA actions.
+   IANA are requested to add a value to the "Hypertext Transfer Protocol
+   (HTTP) Status Code Registry" at https://www.iana.org/assignments/
+   http-status-codes as follows:
+
+   Value:  4xx (to be assigned)
+
+   Description:  Date Not Acceptable
+
+   Reference:  Section 4 of this document
 
 8.  References
 
@@ -327,13 +348,15 @@ Table of Contents
 
    [SIGN]     Backman, A., Richer, J., and M. Sporny, "HTTP Message
               Signatures", Work in Progress, Internet-Draft, draft-ietf-
-              httpbis-message-signatures-07, 20 December 2021,
+              httpbis-message-signatures-08, 28 January 2022,
               <https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-
-              message-signatures-07>.
+              message-signatures-08>.
 
 Acknowledgments
 
-   TODO acknowledge.
+   This document is a result of discussions about how to provide anti-
+   replay protection for OHTTP in which Chris Wood and Eric Rescorla
+   were instrumental.
 
 Author's Address
 
