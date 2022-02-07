@@ -58,9 +58,9 @@ at servers more efficient if requests from either far in the past or into the
 future can be rejected.
 
 This document describes some considerations for using the `Date` request header
-field.  The 4xx (Date Not Acceptable) header field is defined in {{status-code}}
-for use in rejecting requests with a missing or incorrect `Date` request header
-field.
+field.  A new type of problem report {{!PROBLEM=I-D.ietf-httpapi-rfc7807bis}} is
+defined in {{problem-type}} for use in rejecting requests with a missing or
+incorrect `Date` request header field.
 
 {{skew}} explores the consequences of using `Date` header field in requests when
 client and server clocks do not agree.  A method for recovering from differences
@@ -103,12 +103,32 @@ This scheme works for any monotonic value (see for example {{Section 3.4.3 of
 minimal state.
 
 
-# 4xx (Date Not Acceptable) Status Code {#status-code}
+# Date Not Acceptable Problem Type {#problem-type}
 
-A server sends a 4xx (Date Not Acceptable) status code in response to a request
-where the `Date` request header field is either absent or indicates a time that
-is not acceptable to the server.  A server MUST include a `Date` response header
-field in any responses with a 4xx (Date Not Acceptable) status code.
+A server can send a 400-series status code in response to a request where the
+`Date` request header field is either absent or indicates a time that is not
+acceptable to the server.  Including content of type "application/problem+json"
+(or "application/problem+xml"), as defined in {{!PROBLEM}}, in that response
+allows the server to provide more information about the error.
+
+This document defines a problem type of
+"https://iana.org/assignments/http-problem-types#date" for indicating that the
+`Date` request header field is missing or incorrect.  {{ex1}} shows an example
+response in HTTP/1.1 format.
+
+~~~ http-message
+HTTP/1.1 400 Bad Request
+Date: Mon, 07 Feb 2022 00:28:05 GMT
+Content-Type: application/problem+json
+Content-Length: 128
+
+{"type":"https://iana.org/assignments/http-problem-types#date",
+"title": "date field in request outside of acceptable range"}
+~~~
+{: #ex1 title="Example Response"}
+
+A server MUST include a `Date` response header field in any responses that use
+this problem detail type.
 
 In processing a `Date` header field in a request, a server MUST allow for delays
 in transmitting the request, retransmissions performed by transport protocols,
@@ -152,11 +172,11 @@ makes a request without a `Date` header field.
 A client can recover from a failure that caused by a bad clock by adjusting the
 time and re-attempting the request.
 
-For a fresh 4xx (Date Not Acceptable) response (see {{Section 4.2 of
-!CACHING=I-D.ietf-httpbis-cache}}), the client can re-attempt the request,
-copying the `Date` header field from the response into its new request.  If the
-response is stale, the client can add the age of the response to determine the
-time to use in a re-attempt; see {{intermediaries}} for more.
+For a fresh response (see {{Section 4.2 of !CACHING=I-D.ietf-httpbis-cache}}),
+the client can re-attempt the request, copying the `Date` header field from the
+response into its new request.  If the response is stale, the client can add the
+age of the response to determine the time to use in a re-attempt; see
+{{intermediaries}} for more.
 
 In addition to adjusting for response age, the client can adjust the time it
 uses based on the elapsed time since it estimates when the response was
@@ -204,18 +224,18 @@ will rewrite the `Date` header field in responses. This applies especially to
 responses served from cache, but this might also apply to those that are
 forwarded directly from an origin server.
 
-Servers that condition their responses on the `Date` header field SHOULD either
-ensure that intermediaries do not cache responses (by including a
-`Cache-Control` directive of `no-store`) or designate the response as
-conditional on the value of the `Date` request header field (by including the
-token "date" in a `Vary` header field).
-
 For responses that are forwarded by an intermediary, changes to the `Date`
 response header field will not change how the client corrects its clock. Errors
 only occur if the clock at the intermediary differs significantly from the clock
 at the origin server or if the intermediary updates the `Date` response header
 field without also adjusting or removing the `Age` header field on a stale
 response.
+
+Servers that condition their responses on the `Date` header field SHOULD either
+ensure that intermediaries do not cache responses (by including a
+`Cache-Control` directive of `no-store`) or designate the response as
+conditional on the value of the `Date` request header field (by including the
+token "date" in a `Vary` header field).
 
 
 # Security Considerations
@@ -230,18 +250,20 @@ with date correction.
 
 # IANA Considerations
 
-IANA are requested to add a value to the "Hypertext Transfer Protocol (HTTP)
-Status Code Registry" at [](https://www.iana.org/assignments/http-status-codes)
-as follows:
+IANA are requested to create a new entry in the "HTTP Problem Type" registry
+established by {{!PROBLEM}}.
 
-Value:
-: 4xx (to be assigned)
+Type URI:
+: https://iana.org/assignments/http-problem-types#date
 
-Description:
+Title:
 : Date Not Acceptable
 
+Recommended HTTP Status Code:
+: 400
+
 Reference:
-: {{status-code}} of this document
+: {{problem-type}} of this document
 
 --- back
 
