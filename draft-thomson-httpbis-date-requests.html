@@ -1020,7 +1020,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Thomson</td>
-<td class="center">Expires 8 August 2022</td>
+<td class="center">Expires 11 August 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1033,12 +1033,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-thomson-httpbis-date-requests-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-02-04" class="published">4 February 2022</time>
+<time datetime="2022-02-07" class="published">7 February 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-08-08">8 August 2022</time></dd>
+<dd class="expires"><time datetime="2022-08-11">11 August 2022</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1091,7 +1091,7 @@ risks of applying that correction technique are discussed.<a href="#section-abst
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 8 August 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 11 August 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1130,7 +1130,7 @@ risks of applying that correction technique are discussed.<a href="#section-abst
             <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="xref">3</a>.  <a href="#name-date-in-http-requests" class="xref">Date in HTTP Requests</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-4xx-date-not-acceptable-sta" class="xref">4xx (Date Not Acceptable) Status Code</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-date-not-acceptable-problem" class="xref">Date Not Acceptable Problem Type</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-clock-skew" class="xref">Clock Skew</a></p>
@@ -1190,9 +1190,9 @@ same sort of replay protection.  It is possible to make anti-replay protections
 at servers more efficient if requests from either far in the past or into the
 future can be rejected.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">This document describes some considerations for using the <code>Date</code> request header
-field.  The 4xx (Date Not Acceptable) header field is defined in <a href="#status-code" class="xref">Section 4</a>
-for use in rejecting requests with a missing or incorrect <code>Date</code> request header
-field.<a href="#section-1-3" class="pilcrow">¶</a></p>
+field in <a href="#date-req" class="xref">Section 3</a>.  A new type of problem report
+<span>[<a href="#PROBLEM" class="xref">PROBLEM</a>]</span> is defined in <a href="#problem-type" class="xref">Section 4</a> for use
+in rejecting requests with a missing or incorrect <code>Date</code> request header field.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4"><a href="#skew" class="xref">Section 5</a> explores the consequences of using <code>Date</code> header field in requests when
 client and server clocks do not agree.  A method for recovering from differences
 in clocks is described in <a href="#correction" class="xref">Section 5.1</a>.  <a href="#scope" class="xref">Section 5.2</a> describes the privacy
@@ -1210,7 +1210,7 @@ described in BCP 14 <span>[<a href="#RFC2119" class="xref">RFC2119</a>]</span> 
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="date-in-http-requests">
+<div id="date-req">
 <section id="section-3">
       <h2 id="name-date-in-http-requests">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-date-in-http-requests" class="section-name selfRef">Date in HTTP Requests</a>
@@ -1239,26 +1239,50 @@ This scheme works for any monotonic value (see for example <span><a href="https:
 minimal state.<a href="#section-3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="status-code">
+<div id="problem-type">
 <section id="section-4">
-      <h2 id="name-4xx-date-not-acceptable-sta">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-4xx-date-not-acceptable-sta" class="section-name selfRef">4xx (Date Not Acceptable) Status Code</a>
+      <h2 id="name-date-not-acceptable-problem">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-date-not-acceptable-problem" class="section-name selfRef">Date Not Acceptable Problem Type</a>
       </h2>
-<p id="section-4-1">A server sends a 4xx (Date Not Acceptable) status code in response to a request
-where the <code>Date</code> request header field is either absent or indicates a time that
-is not acceptable to the server.  A server <span class="bcp14">MUST</span> include a <code>Date</code> response header
-field in any responses with a 4xx (Date Not Acceptable) status code.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">In processing a <code>Date</code> header field in a request, a server <span class="bcp14">MUST</span> allow for delays
+<p id="section-4-1">A server can send a 400-series status code in response to a request where the
+<code>Date</code> request header field is either absent or indicates a time that is not
+acceptable to the server.  Including content of type "application/problem+json"
+(or "application/problem+xml"), as defined in <span>[<a href="#PROBLEM" class="xref">PROBLEM</a>]</span>, in that response
+allows the server to provide more information about the error.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">This document defines a problem type of
+"https://iana.org/assignments/http-problem-types#date" for indicating that the
+<code>Date</code> request header field is missing or incorrect.  <a href="#ex1" class="xref">Figure 1</a> shows an example
+response in HTTP/1.1 format.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<span id="name-example-response"></span><div id="ex1">
+<figure id="figure-1">
+        <div id="section-4-3.1">
+<pre class="lang-http-message sourcecode">
+HTTP/1.1 400 Bad Request
+Date: Mon, 07 Feb 2022 00:28:05 GMT
+Content-Type: application/problem+json
+Content-Length: 128
+
+{"type":"https://iana.org/assignments/http-problem-types#date",
+"title": "date field in request outside of acceptable range"}
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-example-response" class="selfRef">Example Response</a>
+        </figcaption></figure>
+</div>
+<p id="section-4-4">A server <span class="bcp14">MUST</span> include a <code>Date</code> response header field in any responses that use
+this problem detail type.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-5">In processing a <code>Date</code> header field in a request, a server <span class="bcp14">MUST</span> allow for delays
 in transmitting the request, retransmissions performed by transport protocols,
 plus any processing that might occur in the client and any intermediaries, and
 those parts of the server prior to processing the field.  Additionally, the
 <code>Date</code> header field is only capable of expressing time with a resolution of one
 second.  These factors could mean that the value a server receives could be some
-time in the past.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">Differences between client and server clocks are likely to be a source of most
+time in the past.<a href="#section-4-5" class="pilcrow">¶</a></p>
+<p id="section-4-6">Differences between client and server clocks are likely to be a source of most
 disagreements between the server time and the time expressed in <code>Date</code> request
 header field.  <a href="#skew" class="xref">Section 5</a> will explore this problem in more detail and offer some
-means of handling these disagreements.<a href="#section-4-3" class="pilcrow">¶</a></p>
+means of handling these disagreements.<a href="#section-4-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="skew">
@@ -1289,10 +1313,11 @@ a server will accept.  A server might also reject a request when the client
 makes a request without a <code>Date</code> header field.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.1-2">A client can recover from a failure that caused by a bad clock by adjusting the
 time and re-attempting the request.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3">For a fresh 4xx (Date Not Acceptable) response (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19#section-4.2" class="relref">Section 4.2</a> of [<a href="#CACHING" class="xref">CACHING</a>]</span>), the client can re-attempt the request,
-copying the <code>Date</code> header field from the response into its new request.  If the
-response is stale, the client can add the age of the response to determine the
-time to use in a re-attempt; see <a href="#intermediaries" class="xref">Section 5.3</a> for more.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-3">For a fresh response (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19#section-4.2" class="relref">Section 4.2</a> of [<a href="#CACHING" class="xref">CACHING</a>]</span>),
+the client can re-attempt the request, copying the <code>Date</code> header field from the
+response into its new request.  If the response is stale, the client can add the
+age of the response to determine the time to use in a re-attempt; see
+<a href="#intermediaries" class="xref">Section 5.3</a> for more.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.1-4">In addition to adjusting for response age, the client can adjust the time it
 uses based on the elapsed time since it estimates when the response was
 generated.  Note however that if the client retries a request immediately, any
@@ -1341,17 +1366,17 @@ correction when removing cookies and other state.<a href="#section-5.2-4" class=
 will rewrite the <code>Date</code> header field in responses. This applies especially to
 responses served from cache, but this might also apply to those that are
 forwarded directly from an origin server.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.3-2">Servers that condition their responses on the <code>Date</code> header field <span class="bcp14">SHOULD</span> either
-ensure that intermediaries do not cache responses (by including a
-<code>Cache-Control</code> directive of <code>no-store</code>) or designate the response as
-conditional on the value of the <code>Date</code> request header field (by including the
-token "date" in a <code>Vary</code> header field).<a href="#section-5.3-2" class="pilcrow">¶</a></p>
-<p id="section-5.3-3">For responses that are forwarded by an intermediary, changes to the <code>Date</code>
+<p id="section-5.3-2">For responses that are forwarded by an intermediary, changes to the <code>Date</code>
 response header field will not change how the client corrects its clock. Errors
 only occur if the clock at the intermediary differs significantly from the clock
 at the origin server or if the intermediary updates the <code>Date</code> response header
 field without also adjusting or removing the <code>Age</code> header field on a stale
-response.<a href="#section-5.3-3" class="pilcrow">¶</a></p>
+response.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.3-3">Servers that condition their responses on the <code>Date</code> header field <span class="bcp14">SHOULD</span> either
+ensure that intermediaries do not cache responses (by including a
+<code>Cache-Control</code> directive of <code>no-store</code>) or designate the response as
+conditional on the value of the <code>Date</code> request header field (by including the
+token "date" in a <code>Vary</code> header field).<a href="#section-5.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1373,26 +1398,31 @@ with date correction.<a href="#section-6-2" class="pilcrow">¶</a></p>
       <h2 id="name-iana-considerations">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-7-1">IANA are requested to add a value to the "Hypertext Transfer Protocol (HTTP)
-Status Code Registry" at <span><a href="https://www.iana.org/assignments/http-status-codes">https://www.iana.org/assignments/http-status-codes</a></span>
-as follows:<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">IANA are requested to create a new entry in the "HTTP Problem Type" registry
+established by <span>[<a href="#PROBLEM" class="xref">PROBLEM</a>]</span>.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-7-2">
         <dt id="section-7-2.1">
-Value:  </dt>
+Type URI:  </dt>
         <dd style="margin-left: 1.5em" id="section-7-2.2">
-          <p id="section-7-2.2.1">4xx (to be assigned)<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
+          <p id="section-7-2.2.1">https://iana.org/assignments/http-problem-types#date<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 <dt id="section-7-2.3">
-Description:  </dt>
+Title:  </dt>
         <dd style="margin-left: 1.5em" id="section-7-2.4">
           <p id="section-7-2.4.1">Date Not Acceptable<a href="#section-7-2.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 <dt id="section-7-2.5">
-Reference:  </dt>
+Recommended HTTP Status Code:  </dt>
         <dd style="margin-left: 1.5em" id="section-7-2.6">
-          <p id="section-7-2.6.1"><a href="#status-code" class="xref">Section 4</a> of this document<a href="#section-7-2.6.1" class="pilcrow">¶</a></p>
+          <p id="section-7-2.6.1">400<a href="#section-7-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-2.7">
+Reference:  </dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.8">
+          <p id="section-7-2.8.1"><a href="#problem-type" class="xref">Section 4</a> of this document<a href="#section-7-2.8.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1410,6 +1440,10 @@ Reference:  </dt>
 <dt id="CACHING">[CACHING]</dt>
         <dd>
 <span class="refAuthor">Fielding, R. T.</span>, <span class="refAuthor">Nottingham, M.</span>, and <span class="refAuthor">J. Reschke</span>, <span class="refTitle">"HTTP Caching"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-httpbis-cache-19</span>, <time datetime="2021-09-12" class="refDate">12 September 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19">https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="PROBLEM">[PROBLEM]</dt>
+        <dd>
+<span class="refAuthor">Nottingham, M.</span>, <span class="refAuthor">Wilde, E.</span>, and <span class="refAuthor">S. Dalal</span>, <span class="refTitle">"Problem Details for HTTP APIs"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-httpapi-rfc7807bis-01</span>, <time datetime="2021-10-13" class="refDate">13 October 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-rfc7807bis-01">https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-rfc7807bis-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>

@@ -4,8 +4,8 @@
 
 HTTP                                                          M. Thomson
 Internet-Draft                                                   Mozilla
-Intended status: Standards Track                         4 February 2022
-Expires: 8 August 2022
+Intended status: Standards Track                         7 February 2022
+Expires: 11 August 2022
 
 
               Using The Date Header Field In HTTP Requests
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 August 2022.
+   This Internet-Draft will expire on 11 August 2022.
 
 Copyright Notice
 
@@ -73,7 +73,7 @@ Table of Contents
    1.  Introduction
    2.  Conventions and Definitions
    3.  Date in HTTP Requests
-   4.  4xx (Date Not Acceptable) Status Code
+   4.  Date Not Acceptable Problem Type
    5.  Clock Skew
      5.1.  Date Correction
      5.2.  Limitations of Date Correction
@@ -103,9 +103,9 @@ Table of Contents
    into the future can be rejected.
 
    This document describes some considerations for using the Date
-   request header field.  The 4xx (Date Not Acceptable) header field is
-   defined in Section 4 for use in rejecting requests with a missing or
-   incorrect Date request header field.
+   request header field in Section 3.  A new type of problem report
+   [PROBLEM] is defined in Section 4 for use in rejecting requests with
+   a missing or incorrect Date request header field.
 
    Section 5 explores the consequences of using Date header field in
    requests when client and server clocks do not agree.  A method for
@@ -154,13 +154,32 @@ Table of Contents
    and allows for efficient rejection of duplicate requests with minimal
    state.
 
-4.  4xx (Date Not Acceptable) Status Code
+4.  Date Not Acceptable Problem Type
 
-   A server sends a 4xx (Date Not Acceptable) status code in response to
-   a request where the Date request header field is either absent or
-   indicates a time that is not acceptable to the server.  A server MUST
-   include a Date response header field in any responses with a 4xx
-   (Date Not Acceptable) status code.
+   A server can send a 400-series status code in response to a request
+   where the Date request header field is either absent or indicates a
+   time that is not acceptable to the server.  Including content of type
+   "application/problem+json" (or "application/problem+xml"), as defined
+   in [PROBLEM], in that response allows the server to provide more
+   information about the error.
+
+   This document defines a problem type of
+   "https://iana.org/assignments/http-problem-types#date" for indicating
+   that the Date request header field is missing or incorrect.  Figure 1
+   shows an example response in HTTP/1.1 format.
+
+   HTTP/1.1 400 Bad Request
+   Date: Mon, 07 Feb 2022 00:28:05 GMT
+   Content-Type: application/problem+json
+   Content-Length: 128
+
+   {"type":"https://iana.org/assignments/http-problem-types#date",
+   "title": "date field in request outside of acceptable range"}
+
+                         Figure 1: Example Response
+
+   A server MUST include a Date response header field in any responses
+   that use this problem detail type.
 
    In processing a Date header field in a request, a server MUST allow
    for delays in transmitting the request, retransmissions performed by
@@ -205,11 +224,11 @@ Table of Contents
    A client can recover from a failure that caused by a bad clock by
    adjusting the time and re-attempting the request.
 
-   For a fresh 4xx (Date Not Acceptable) response (see Section 4.2 of
-   [CACHING]), the client can re-attempt the request, copying the Date
-   header field from the response into its new request.  If the response
-   is stale, the client can add the age of the response to determine the
-   time to use in a re-attempt; see Section 5.3 for more.
+   For a fresh response (see Section 4.2 of [CACHING]), the client can
+   re-attempt the request, copying the Date header field from the
+   response into its new request.  If the response is stale, the client
+   can add the age of the response to determine the time to use in a re-
+   attempt; see Section 5.3 for more.
 
    In addition to adjusting for response age, the client can adjust the
    time it uses based on the elapsed time since it estimates when the
@@ -259,18 +278,18 @@ Table of Contents
    also apply to those that are forwarded directly from an origin
    server.
 
-   Servers that condition their responses on the Date header field
-   SHOULD either ensure that intermediaries do not cache responses (by
-   including a Cache-Control directive of no-store) or designate the
-   response as conditional on the value of the Date request header field
-   (by including the token "date" in a Vary header field).
-
    For responses that are forwarded by an intermediary, changes to the
    Date response header field will not change how the client corrects
    its clock.  Errors only occur if the clock at the intermediary
    differs significantly from the clock at the origin server or if the
    intermediary updates the Date response header field without also
    adjusting or removing the Age header field on a stale response.
+
+   Servers that condition their responses on the Date header field
+   SHOULD either ensure that intermediaries do not cache responses (by
+   including a Cache-Control directive of no-store) or designate the
+   response as conditional on the value of the Date request header field
+   (by including the token "date" in a Vary header field).
 
 6.  Security Considerations
 
@@ -283,13 +302,14 @@ Table of Contents
 
 7.  IANA Considerations
 
-   IANA are requested to add a value to the "Hypertext Transfer Protocol
-   (HTTP) Status Code Registry" at https://www.iana.org/assignments/
-   http-status-codes as follows:
+   IANA are requested to create a new entry in the "HTTP Problem Type"
+   registry established by [PROBLEM].
 
-   Value:  4xx (to be assigned)
+   Type URI:  https://iana.org/assignments/http-problem-types#date
 
-   Description:  Date Not Acceptable
+   Title:  Date Not Acceptable
+
+   Recommended HTTP Status Code:  400
 
    Reference:  Section 4 of this document
 
@@ -302,6 +322,12 @@ Table of Contents
               httpbis-cache-19, 12 September 2021,
               <https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-
               cache-19>.
+
+   [PROBLEM]  Nottingham, M., Wilde, E., and S. Dalal, "Problem Details
+              for HTTP APIs", Work in Progress, Internet-Draft, draft-
+              ietf-httpapi-rfc7807bis-01, 13 October 2021,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-
+              rfc7807bis-01>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
