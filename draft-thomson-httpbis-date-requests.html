@@ -1332,29 +1332,29 @@ additional increment is likely to be less than the one second resolution of the
         </h3>
 <p id="section-5.2-1">Clients <span class="bcp14">MUST NOT</span> accept the time provided by an arbitrary HTTP server as the
 basis for system-wide time.  Even if the client code in question were able to
-set the time, this exposes clients to attack.  The source of system time
-information needs to be trustworthy as the current time is a critical input to
-security-relevant decisions, such as whether to accept a server certificate
-<span>[<a href="#RFC6125" class="xref">RFC6125</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+set the time, altering the system clock in this way exposes clients to attack.
+The source of system time information needs to be trustworthy as the current
+time is a critical input to security-relevant decisions, such as whether to
+accept a server certificate <span>[<a href="#RFC6125" class="xref">RFC6125</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 <p id="section-5.2-2">Use of date correction allows requests that use the correction to be correlated.
-An immediate retry of an identical request with an update <code>Date</code> header field
-only provides the server with the ability to match the retry to the original
-request, but making multiple requests with the same correction links all of
-those requests.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+Limitations on use of date corrections is necessary to ensure privacy.  An
+immediate retry of an identical request with an update <code>Date</code> header field is
+safe in that it only provides the server with the ability to match the retry to
+the original request.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
 <p id="section-5.2-3">Anything other than an immediate retry requires careful consideration of the
 privacy implications.  Use of the same date correction for other requests can be
 used to link those requests to the same client.  Using the same date correction
 is equivalent to connection reuse, cookies, TLS session tickets, or other state
-a client might carry between requests.  Linking requests might be acceptable
-only where other forms of linkage already exist.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
-<p id="section-5.2-4">Limitations on use of date corrections is necessary to ensure privacy.  At a
-minimum, clients <span class="bcp14">MUST NOT</span> use the time correction from one server when making
-requests of another server.  Using the same date correction across different
-servers might be used by servers to create a communication channel.  For clients
-that maintain per-server state, the specific date correction that is used for
-each server <span class="bcp14">MUST</span> be cleared when removing other state for that server.  For
-instance, a web browser that remembers a date correction would forget that
-correction when removing cookies and other state.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+a client might carry between requests.  Linking requests might be acceptable,
+but in general only where other forms of linkage already exist.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">Clients <span class="bcp14">MUST NOT</span> use the time correction from one server when making requests of
+another server.  Using the same date correction across different servers might
+be used by servers to link client identities and to exchange information via a
+channel provided by the client.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+<p id="section-5.2-5">For clients that maintain per-server state, the specific date correction that is
+used for each server <span class="bcp14">MUST</span> be cleared when removing other state for that server
+to prevent re-identification.  For instance, a web browser that remembers a date
+correction would forget that correction when removing cookies and other state.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="intermediaries">
