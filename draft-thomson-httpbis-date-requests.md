@@ -189,32 +189,33 @@ additional increment is likely to be less than the one second resolution of the
 
 Clients MUST NOT accept the time provided by an arbitrary HTTP server as the
 basis for system-wide time.  Even if the client code in question were able to
-set the time, this exposes clients to attack.  The source of system time
-information needs to be trustworthy as the current time is a critical input to
-security-relevant decisions, such as whether to accept a server certificate
-{{?RFC6125}}.
+set the time, altering the system clock in this way exposes clients to attack.
+The source of system time information needs to be trustworthy as the current
+time is a critical input to security-relevant decisions, such as whether to
+accept a server certificate {{?RFC6125}}.
 
 Use of date correction allows requests that use the correction to be correlated.
-An immediate retry of an identical request with an update `Date` header field
-only provides the server with the ability to match the retry to the original
-request, but making multiple requests with the same correction links all of
-those requests.
+Limitations on use of date corrections is necessary to ensure privacy.  An
+immediate retry of an identical request with an update `Date` header field is
+safe in that it only provides the server with the ability to match the retry to
+the original request.
 
 Anything other than an immediate retry requires careful consideration of the
 privacy implications.  Use of the same date correction for other requests can be
 used to link those requests to the same client.  Using the same date correction
 is equivalent to connection reuse, cookies, TLS session tickets, or other state
-a client might carry between requests.  Linking requests might be acceptable
-only where other forms of linkage already exist.
+a client might carry between requests.  Linking requests might be acceptable,
+but in general only where other forms of linkage already exist.
 
-Limitations on use of date corrections is necessary to ensure privacy.  At a
-minimum, clients MUST NOT use the time correction from one server when making
-requests of another server.  Using the same date correction across different
-servers might be used by servers to create a communication channel.  For clients
-that maintain per-server state, the specific date correction that is used for
-each server MUST be cleared when removing other state for that server.  For
-instance, a web browser that remembers a date correction would forget that
-correction when removing cookies and other state.
+Clients MUST NOT use the time correction from one server when making requests of
+another server.  Using the same date correction across different servers might
+be used by servers to link client identities and to exchange information via a
+channel provided by the client.
+
+For clients that maintain per-server state, the specific date correction that is
+used for each server MUST be cleared when removing other state for that server
+to prevent re-identification.  For instance, a web browser that remembers a date
+correction would forget that correction when removing cookies and other state.
 
 
 ## Intermediaries and Date Corrections {#intermediaries}
