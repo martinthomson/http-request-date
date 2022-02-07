@@ -3,18 +3,18 @@ title: "Using The Date Header Field In HTTP Requests"
 abbrev: "Date Requests"
 category: std
 
-docname: draft-thomson-httpbis-date-requests-latest
+docname: draft-thomson-httpapi-date-requests-latest
 ipr: trust200902
 area: "Applications and Real-Time"
-workgroup: "HTTP"
+workgroup: "Building Blocks for HTTP APIs"
 keyword: Internet-Draft
 venue:
-  group: "HTTP"
+  group: "Building Blocks for HTTP APIs"
   type: "Working Group"
-  mail: "ietf-http-wg@w3.org"
-  arch: "https://lists.w3.org/Archives/Public/ietf-http-wg/"
+  mail: "httpapi@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/httpapi/"
   github: "martinthomson/http-request-date"
-  latest: "https://martinthomson.github.io/http-request-date/draft-thomson-httpbis-date-requests.html"
+  latest: "https://martinthomson.github.io/http-request-date/draft-thomson-httpapi-date-requests.html"
 
 stand_alone: yes
 smart_quotes: no
