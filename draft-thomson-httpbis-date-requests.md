@@ -58,9 +58,9 @@ at servers more efficient if requests from either far in the past or into the
 future can be rejected.
 
 This document describes some considerations for using the `Date` request header
-field.  A new type of problem report {{!PROBLEM=I-D.ietf-httpapi-rfc7807bis}} is
-defined in {{problem-type}} for use in rejecting requests with a missing or
-incorrect `Date` request header field.
+field in {{date-req}}.  A new type of problem report
+{{!PROBLEM=I-D.ietf-httpapi-rfc7807bis}} is defined in {{problem-type}} for use
+in rejecting requests with a missing or incorrect `Date` request header field.
 
 {{skew}} explores the consequences of using `Date` header field in requests when
 client and server clocks do not agree.  A method for recovering from differences
@@ -73,7 +73,7 @@ considerations that apply to this technique.
 {::boilerplate bcp14-tagged}
 
 
-# Date in HTTP Requests
+# Date in HTTP Requests {#date-req}
 
 Most HTTP clients have no need to use the `Date` header field in requests.  This
 only changes if it is important that the request not be considered valid at
