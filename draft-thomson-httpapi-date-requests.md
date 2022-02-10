@@ -22,7 +22,7 @@ pi: [toc, sortrefs, symrefs]
 
 author:
  -
-    name: Martin Thomson
+    fullname: Martin Thomson
     organization: Mozilla
     email: mt@lowentropy.net
 
