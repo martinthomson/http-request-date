@@ -1341,6 +1341,13 @@ the server to learn what the client believes the round-trip time to the server
 is.  This depends on the resolution of the timestamp field that is used, but
 this could also be used to gain some information about the network location of
 the client.<a href="#section-5.1-5" class="pilcrow">¶</a></p>
+<p id="section-5.1-6">Applications that convey timestamps that are independent of the current time
+might do so without considering whether the clocks at client and server agree.
+However, where the client selects a timestamp relative to its clock and the
+selected representation might depend on that timestamp, this correction
+technique might still be useful.  A client can reattempt the request with a
+corrected timestamp when the <code>Date</code> header field of the response indicates a
+difference in clocks that might be significant.<a href="#section-5.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="scope">
