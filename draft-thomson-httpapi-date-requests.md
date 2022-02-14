@@ -272,6 +272,11 @@ Including a timestamp in requests reveals information about the client clock.
 This might be used to fingerprint clients {{UWT}} or to identify clients with
 vulnerability to attacks that depend on incorrect clocks.
 
+Clients can randomize the value that they provide the server to obscure the true
+value of their clock and prevent linking of requests over time.  However, this
+increases the risk that a server will reject a request due to it being
+unacceptable.
+
 {{scope}} contains a discussion of the security and privacy concerns associated
 with date correction.
 
