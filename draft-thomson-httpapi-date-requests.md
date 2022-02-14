@@ -211,6 +211,14 @@ is.  This depends on the resolution of the timestamp field that is used, but
 this could also be used to gain some information about the network location of
 the client.
 
+Applications that convey timestamps that are independent of the current time
+might do so without considering whether the clocks at client and server agree.
+However, where the client selects a timestamp relative to its clock and the
+selected representation might depend on that timestamp, this correction
+technique might still be useful.  A client can reattempt the request with a
+corrected timestamp when the `Date` header field of the response indicates a
+difference in clocks that might be significant.
+
 
 ## Limitations of Date Correction {#scope}
 
