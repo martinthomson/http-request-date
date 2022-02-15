@@ -109,19 +109,23 @@ information might be used.  It might be acceptable for the same request to be
 made multiple times over a fixed period.
 
 In other cases, the inclusion of a date or timestamp might be part of an
-anti-replay strategy at a server.  A simple anti-replay scheme starts by
-choosing a window of time anchored at the current time.  Requests with
-timestamps that fall within this period are remembered and rejected if they
-appear again; requests with timestamps outside of this window are rejected.
-This scheme works for any monotonic value (see for example {{Section 3.4.3 of
-?RFC4303}}) and allows for efficient rejection of duplicate requests with
-minimal state.
+anti-replay strategy at a server.  A simple anti-replay scheme detects replayed
+or duplicate requests by remembering accepted requests (or some part of a
+request that is unique such as a nonce, signature, or other unique value).  Over
+longer periods of time, this approach could require an unbounded amount of
+state, so a simple technique limits the stored data to a small window of time.
+Requests are required to include a timestamp.  A new request is rejected either
+if it contains a timestamp that is outside the window or if it matches a
+previously accepted request.  The window tracks the current time, so when
+requests with timestamps leave the window they can be forgotten.  This scheme
+works for any monotonic value (see for example {{Section 3.4.3 of ?RFC4303}})
+and allows for efficient rejection of duplicate requests with minimal state.
 
 
 # Date Not Acceptable Problem Type {#problem-type}
 
 A server can send a 400-series status code in response to a request where the
-`Date` request header field or other timestamp is either absent or not
+`Date` request header field or other timestamp that is either absent or not
 acceptable to the server.  Including content of type "application/problem+json"
 (or "application/problem+xml"), as defined in {{!PROBLEM}}, in that response
 allows the server to provide more information about the error.
@@ -181,13 +185,12 @@ of values it accepts.
 
 ## Date Correction {#correction}
 
-Even when a server is tolerant of small clock errors, a valid request from a
-client can be rejected if the client clock is outside of the range of times that
-a server will accept.  A server might also reject a request when the client
-makes a request without a timestamp.
+When a `Date` header field or timestamp is intended to represent the current
+time, a client can use an error response (such as described in {{problem-type}})
+to correct the time it uses.
 
-A client can recover from a failure that caused by a bad clock by adjusting the
-time and re-attempting the request.
+A client can recover from a failure caused by a bad clock by adjusting the time
+and re-attempting the request.
 
 For a fresh response (see {{Section 4.2 of !CACHING=I-D.ietf-httpbis-cache}}),
 the client can re-attempt the request immediately, copying the `Date` header
@@ -216,8 +219,8 @@ might do so without considering whether the clocks at client and server agree.
 However, where the client selects a timestamp relative to its clock and the
 selected representation might depend on that timestamp, this correction
 technique might still be useful.  A client can reattempt the request with a
-corrected timestamp when the `Date` header field of the response indicates a
-difference in clocks that might be significant.
+corrected timestamp when the `Date` header field of any response indicates a
+difference in clocks that might affect the response.
 
 
 ## Limitations of Date Correction {#scope}
