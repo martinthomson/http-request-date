@@ -98,9 +98,9 @@ time over which delay or replay is possible.
 
 Signed HTTP requests {{SIGN}} and JSON Web Tokens {{?JWT=RFC7519}} are other
 examples of where requests - or parts of requests - might be protected to
-prevent certain attacks by intermediaries.  Signatures are often used to enhance
-protections for requests for privileged action on resources.  Adding a `Date`
-header field or some other field (`created` for {{?SIGN}} or `iat` for {{?JWT}})
+mitigate certain attacks by intermediaries.
+Adding timestamps using a `Date`
+header field or some other mechanism (`created` for {{?SIGN}} or `iat` for {{?JWT}})
 and signing that information can ensure that the request cannot be captured and
 used at a very different time to what was intended.
 
