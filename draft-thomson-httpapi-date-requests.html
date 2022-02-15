@@ -1020,7 +1020,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Thomson</td>
-<td class="center">Expires 18 August 2022</td>
+<td class="center">Expires 19 August 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1033,12 +1033,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-thomson-httpapi-date-requests-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-02-14" class="published">14 February 2022</time>
+<time datetime="2022-02-15" class="published">15 February 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-08-18">18 August 2022</time></dd>
+<dd class="expires"><time datetime="2022-08-19">19 August 2022</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1091,7 +1091,7 @@ clocks. The risks of applying that correction technique are discussed.<a href="#
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 18 August 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 19 August 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1238,12 +1238,17 @@ used at a very different time to what was intended.<a href="#section-3-3" class=
 information might be used.  It might be acceptable for the same request to be
 made multiple times over a fixed period.<a href="#section-3-4" class="pilcrow">¶</a></p>
 <p id="section-3-5">In other cases, the inclusion of a date or timestamp might be part of an
-anti-replay strategy at a server.  A simple anti-replay scheme starts by
-choosing a window of time anchored at the current time.  Requests with
-timestamps that fall within this period are remembered and rejected if they
-appear again; requests with timestamps outside of this window are rejected.
-This scheme works for any monotonic value (see for example <span><a href="https://rfc-editor.org/rfc/rfc4303#section-3.4.3" class="relref">Section 3.4.3</a> of [<a href="#RFC4303" class="xref">RFC4303</a>]</span>) and allows for efficient rejection of duplicate requests with
-minimal state.<a href="#section-3-5" class="pilcrow">¶</a></p>
+anti-replay strategy at a server.  A simple anti-replay scheme detects replayed
+or duplicate requests by remembering accepted requests (or some part of a
+request that is unique such as a nonce, signature, or other unique value).  Over
+longer periods of time, this approach could require an unbounded amount of
+state, so a simple technique limits the stored data to a small window of time.
+Requests are required to include a timestamp.  A new request is rejected either
+if it contains a timestamp that is outside the window or if it matches a
+previously accepted request.  The window tracks the current time, so when
+requests with timestamps leave the window they can be forgotten.  This scheme
+works for any monotonic value (see for example <span><a href="https://rfc-editor.org/rfc/rfc4303#section-3.4.3" class="relref">Section 3.4.3</a> of [<a href="#RFC4303" class="xref">RFC4303</a>]</span>)
+and allows for efficient rejection of duplicate requests with minimal state.<a href="#section-3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="problem-type">
@@ -1252,7 +1257,7 @@ minimal state.<a href="#section-3-5" class="pilcrow">¶</a></p>
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-date-not-acceptable-problem" class="section-name selfRef">Date Not Acceptable Problem Type</a>
       </h2>
 <p id="section-4-1">A server can send a 400-series status code in response to a request where the
-<code>Date</code> request header field or other timestamp is either absent or not
+<code>Date</code> request header field or other timestamp that is either absent or not
 acceptable to the server.  Including content of type "application/problem+json"
 (or "application/problem+xml"), as defined in <span>[<a href="#PROBLEM" class="xref">PROBLEM</a>]</span>, in that response
 allows the server to provide more information about the error.<a href="#section-4-1" class="pilcrow">¶</a></p>
@@ -1316,12 +1321,11 @@ of values it accepts.<a href="#section-5-3" class="pilcrow">¶</a></p>
         <h3 id="name-date-correction">
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-date-correction" class="section-name selfRef">Date Correction</a>
         </h3>
-<p id="section-5.1-1">Even when a server is tolerant of small clock errors, a valid request from a
-client can be rejected if the client clock is outside of the range of times that
-a server will accept.  A server might also reject a request when the client
-makes a request without a timestamp.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">A client can recover from a failure that caused by a bad clock by adjusting the
-time and re-attempting the request.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-1">When a <code>Date</code> header field or timestamp is intended to represent the current
+time, a client can use an error response (such as described in <a href="#problem-type" class="xref">Section 4</a>)
+to correct the time it uses.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">A client can recover from a failure caused by a bad clock by adjusting the time
+and re-attempting the request.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 <p id="section-5.1-3">For a fresh response (see <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-cache-19#section-4.2" class="relref">Section 4.2</a> of [<a href="#CACHING" class="xref">CACHING</a>]</span>),
 the client can re-attempt the request immediately, copying the <code>Date</code> header
 field from the response into its new request.  If the response is stale, the
@@ -1346,8 +1350,8 @@ might do so without considering whether the clocks at client and server agree.
 However, where the client selects a timestamp relative to its clock and the
 selected representation might depend on that timestamp, this correction
 technique might still be useful.  A client can reattempt the request with a
-corrected timestamp when the <code>Date</code> header field of the response indicates a
-difference in clocks that might be significant.<a href="#section-5.1-6" class="pilcrow">¶</a></p>
+corrected timestamp when the <code>Date</code> header field of any response indicates a
+difference in clocks that might affect the response.<a href="#section-5.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="scope">
@@ -1507,7 +1511,7 @@ Reference:  </dt>
 <dd class="break"></dd>
 <dt id="OHTTP">[OHTTP]</dt>
         <dd>
-<span class="refAuthor">Thomson, M.</span> and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Oblivious HTTP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ohai-ohttp-00</span>, <time datetime="2021-11-25" class="refDate">25 November 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-ohai-ohttp-00">https://datatracker.ietf.org/doc/html/draft-ietf-ohai-ohttp-00</a>&gt;</span>. </dd>
+<span class="refAuthor">Thomson, M.</span> and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Oblivious HTTP"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ohai-ohttp-01</span>, <time datetime="2022-02-15" class="refDate">15 February 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-ohai-ohttp-01">https://datatracker.ietf.org/doc/html/draft-ietf-ohai-ohttp-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4303">[RFC4303]</dt>
         <dd>

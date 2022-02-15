@@ -4,8 +4,8 @@
 
 Building Blocks for HTTP APIs                                 M. Thomson
 Internet-Draft                                                   Mozilla
-Intended status: Standards Track                        14 February 2022
-Expires: 18 August 2022
+Intended status: Standards Track                        15 February 2022
+Expires: 19 August 2022
 
 
                  Using Dates and Times In HTTP Requests
@@ -52,7 +52,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 18 August 2022.
+   This Internet-Draft will expire on 19 August 2022.
 
 Copyright Notice
 
@@ -153,17 +153,23 @@ Table of Contents
 
    In other cases, the inclusion of a date or timestamp might be part of
    an anti-replay strategy at a server.  A simple anti-replay scheme
-   starts by choosing a window of time anchored at the current time.
-   Requests with timestamps that fall within this period are remembered
-   and rejected if they appear again; requests with timestamps outside
-   of this window are rejected.  This scheme works for any monotonic
-   value (see for example Section 3.4.3 of [RFC4303]) and allows for
-   efficient rejection of duplicate requests with minimal state.
+   detects replayed or duplicate requests by remembering accepted
+   requests (or some part of a request that is unique such as a nonce,
+   signature, or other unique value).  Over longer periods of time, this
+   approach could require an unbounded amount of state, so a simple
+   technique limits the stored data to a small window of time.  Requests
+   are required to include a timestamp.  A new request is rejected
+   either if it contains a timestamp that is outside the window or if it
+   matches a previously accepted request.  The window tracks the current
+   time, so when requests with timestamps leave the window they can be
+   forgotten.  This scheme works for any monotonic value (see for
+   example Section 3.4.3 of [RFC4303]) and allows for efficient
+   rejection of duplicate requests with minimal state.
 
 4.  Date Not Acceptable Problem Type
 
    A server can send a 400-series status code in response to a request
-   where the Date request header field or other timestamp is either
+   where the Date request header field or other timestamp that is either
    absent or not acceptable to the server.  Including content of type
    "application/problem+json" (or "application/problem+xml"), as defined
    in [PROBLEM], in that response allows the server to provide more
@@ -223,12 +229,11 @@ Table of Contents
 
 5.1.  Date Correction
 
-   Even when a server is tolerant of small clock errors, a valid request
-   from a client can be rejected if the client clock is outside of the
-   range of times that a server will accept.  A server might also reject
-   a request when the client makes a request without a timestamp.
+   When a Date header field or timestamp is intended to represent the
+   current time, a client can use an error response (such as described
+   in Section 4) to correct the time it uses.
 
-   A client can recover from a failure that caused by a bad clock by
+   A client can recover from a failure caused by a bad clock by
    adjusting the time and re-attempting the request.
 
    For a fresh response (see Section 4.2 of [CACHING]), the client can
@@ -260,8 +265,8 @@ Table of Contents
    timestamp relative to its clock and the selected representation might
    depend on that timestamp, this correction technique might still be
    useful.  A client can reattempt the request with a corrected
-   timestamp when the Date header field of the response indicates a
-   difference in clocks that might be significant.
+   timestamp when the Date header field of any response indicates a
+   difference in clocks that might affect the response.
 
 5.2.  Limitations of Date Correction
 
@@ -399,9 +404,9 @@ Table of Contents
               <https://www.rfc-editor.org/rfc/rfc5905>.
 
    [OHTTP]    Thomson, M. and C. A. Wood, "Oblivious HTTP", Work in
-              Progress, Internet-Draft, draft-ietf-ohai-ohttp-00, 25
-              November 2021, <https://datatracker.ietf.org/doc/html/
-              draft-ietf-ohai-ohttp-00>.
+              Progress, Internet-Draft, draft-ietf-ohai-ohttp-01, 15
+              February 2022, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-ohai-ohttp-01>.
 
    [RFC4303]  Kent, S., "IP Encapsulating Security Payload (ESP)",
               RFC 4303, DOI 10.17487/RFC4303, December 2005,
