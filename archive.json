@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-02-13T01:01:28.369043+00:00",
+  "timestamp": "2022-02-15T01:04:56.030949+00:00",
   "repo": "martinthomson/http-request-date",
   "labels": [
     {
@@ -49,6 +49,31 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOGubDos5Dzfyu",
+      "title": "Is Signatures a relevant use case?",
+      "url": "https://github.com/martinthomson/http-request-date/issues/1",
+      "state": "OPEN",
+      "author": "ioggstream",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "## Question\r\n\r\nThe considerations in this document make me think that Signature is not a relevant use case,\r\nat least to be mentioned in the Introduction.\r\n\r\nWhile similar considerations apply to any timestamp conveyed by protocols not designed for time synchronization,\r\nthat is JWT header parameters, or Signature field parameters like `created` and `expires`,\r\nthese are better suited to convey time information related to the validity of signatures  than the `Date` header.\r\n\r\nThe same considerations will probably apply wrt avoiding replay attacks.",
+      "createdAt": "2022-02-14T16:50:48Z",
+      "updatedAt": "2022-02-14T22:11:41Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "martinthomson",
+          "authorAssociation": "OWNER",
+          "body": "Hey Roberto, I've made a few changes to the document to address this specific issue; is that the version you are looking at?\r\n\r\nSee https://martinthomson.github.io/http-request-date/draft-thomson-httpapi-date-requests.html for the latest (unpublished) version.",
+          "createdAt": "2022-02-14T22:11:41Z",
+          "updatedAt": "2022-02-14T22:11:41Z"
+        }
+      ]
+    }
+  ],
   "pulls": []
 }
