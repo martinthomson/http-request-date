@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-02-15T01:04:56.030949+00:00",
+  "timestamp": "2022-02-17T00:53:39.059552+00:00",
   "repo": "martinthomson/http-request-date",
   "labels": [
     {
@@ -55,15 +55,15 @@
       "id": "I_kwDOGubDos5Dzfyu",
       "title": "Is Signatures a relevant use case?",
       "url": "https://github.com/martinthomson/http-request-date/issues/1",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "ioggstream",
       "authorAssociation": "NONE",
       "assignees": [],
       "labels": [],
       "body": "## Question\r\n\r\nThe considerations in this document make me think that Signature is not a relevant use case,\r\nat least to be mentioned in the Introduction.\r\n\r\nWhile similar considerations apply to any timestamp conveyed by protocols not designed for time synchronization,\r\nthat is JWT header parameters, or Signature field parameters like `created` and `expires`,\r\nthese are better suited to convey time information related to the validity of signatures  than the `Date` header.\r\n\r\nThe same considerations will probably apply wrt avoiding replay attacks.",
       "createdAt": "2022-02-14T16:50:48Z",
-      "updatedAt": "2022-02-14T22:11:41Z",
-      "closedAt": null,
+      "updatedAt": "2022-02-15T10:26:29Z",
+      "closedAt": "2022-02-15T10:26:29Z",
       "comments": [
         {
           "author": "martinthomson",
@@ -71,9 +71,85 @@
           "body": "Hey Roberto, I've made a few changes to the document to address this specific issue; is that the version you are looking at?\r\n\r\nSee https://martinthomson.github.io/http-request-date/draft-thomson-httpapi-date-requests.html for the latest (unpublished) version.",
           "createdAt": "2022-02-14T22:11:41Z",
           "updatedAt": "2022-02-14T22:11:41Z"
+        },
+        {
+          "author": "ioggstream",
+          "authorAssociation": "NONE",
+          "body": "Martin, thanks for the changes: they go in the right direction. I will share some feedback on the anti-reply part.",
+          "createdAt": "2022-02-15T08:52:55Z",
+          "updatedAt": "2022-02-15T08:52:55Z"
         }
       ]
     }
   ],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 2,
+      "id": "PR_kwDOGubDos4y2Qc9",
+      "title": "Minor comments",
+      "url": "https://github.com/martinthomson/http-request-date/pull/2",
+      "state": "OPEN",
+      "author": "ioggstream",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "## Preliminary feedback\r\n\r\n- do we need to tie it to privileged actions?\r\n\r\n- to be expanded: use cases like signatures specify a time interval, not just a timestamp... in this perspective, line 103  can be misleading.\r\n\r\nQuestion:  shouldn't replay attacks to be addressed with a unique identifier ?\r\nProbably timestamps only address the intercept and reuse (without replay) kind of attack, but this is your field :P\r\n\r\n",
+      "createdAt": "2022-02-15T10:26:19Z",
+      "updatedAt": "2022-02-15T23:19:42Z",
+      "baseRepository": "martinthomson/http-request-date",
+      "baseRefName": "main",
+      "baseRefOid": "2bfc2bc0c092d8d4559922da5a986f4e82af108a",
+      "headRepository": "ioggstream/http-request-date",
+      "headRefName": "main",
+      "headRefOid": "cd6b7c1cbafee03f7b0bcf28b2e516d78fade86d",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "martinthomson",
+          "authorAssociation": "OWNER",
+          "body": "In answer to your question, yes, replay attacks usually rely on some sort of unique value to detect duplicates.  In some contexts, you have a sequence number.  For signature schemes, most use a random value [^1] that can be used for detecting duplicates.  For HPKE, the encryption contains a fresh random share for each encryption (called `enc`) that can be used for the same purpose.\r\n\r\nI need to improve my description of anti-replay; I'll take that up separately.\r\n\r\n[^1]: ...technically just unpredictable and probably unique",
+          "createdAt": "2022-02-15T23:19:42Z",
+          "updatedAt": "2022-02-15T23:19:42Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOGubDos40rRdP",
+          "commit": {
+            "abbreviatedOid": "e82b00f"
+          },
+          "author": "martinthomson",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Thanks Roberto.  This is better, I agree.",
+          "createdAt": "2022-02-15T23:13:26Z",
+          "updatedAt": "2022-02-15T23:13:26Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOGubDos40rRpo",
+          "commit": {
+            "abbreviatedOid": "e82b00f"
+          },
+          "author": "martinthomson",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-02-15T23:14:42Z",
+          "updatedAt": "2022-02-15T23:14:43Z",
+          "comments": [
+            {
+              "originalPosition": 8,
+              "body": "```suggestion\r\nmitigate certain attacks by intermediaries.  Adding timestamps using a `Date`\r\n```",
+              "createdAt": "2022-02-15T23:14:43Z",
+              "updatedAt": "2022-02-15T23:14:43Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
